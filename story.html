@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Our Story — The Detox Club</title>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+body { background: var(--cream); }
+.story-hero {
+  min-height: 70vh;
+  background: var(--cream-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 100px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.story-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(122,140,94,0.15) 0%, transparent 70%);
+}
+.story-hero-inner { position: relative; max-width: 700px; }
+.story-hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(48px,8vw,88px);
+  font-weight: 300;
+  color: var(--charcoal);
+  line-height: 1.05;
+  margin-bottom: 24px;
+}
+.story-hero h1 em { font-style: italic; color: var(--sage); }
+.story-hero p {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ORIGIN SECTION */
+.story-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 90px 40px;
+}
+.story-intro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  margin-top: 50px;
+}
+.story-intro-text p {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--charcoal);
+  margin-bottom: 20px;
+}
+.story-intro-visual {
+  background: var(--charcoal);
+  border-radius: 20px;
+  padding: 48px 36px;
+  text-align: center;
+}
+.story-intro-visual img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 4px solid rgba(196,168,130,0.3);
+}
+.story-intro-visual h3 {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--cream);
+  margin-bottom: 8px;
+}
+.story-intro-visual p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* VALUES */
+.values-section {
+  background: var(--charcoal);
+  padding: 90px 40px;
+}
+.values-inner { max-width: 1100px; margin: 0 auto; }
+.values-inner .section-title { color: var(--cream); }
+.values-inner .section-subtitle { color: var(--tan); }
+.values-inner .section-divider { background: var(--tan); }
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-top: 50px;
+}
+.value-card {
+  background: rgba(255,253,244,0.06);
+  border: 1px solid rgba(196,168,130,0.2);
+  border-radius: 16px;
+  padding: 32px 28px;
+  transition: var(--transition);
+}
+.value-card:hover {
+  background: rgba(255,253,244,0.1);
+  transform: translateY(-4px);
+  border-color: rgba(196,168,130,0.4);
+}
+.value-icon { font-size: 32px; margin-bottom: 16px; }
+.value-title { font-family: var(--font-serif); font-size: 24px; font-weight: 400; color: var(--cream); margin-bottom: 10px; }
+.value-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+/* SPACE SECTION */
+.space-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 90px 40px;
+}
+.space-quote {
+  font-family: var(--font-serif);
+  font-size: clamp(26px,4vw,44px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--charcoal);
+  line-height: 1.4;
+  text-align: center;
+  margin: 50px 0;
+  padding: 0 40px;
+  position: relative;
+}
+.space-quote::before {
+  content: '"';
+  position: absolute;
+  top: -20px;
+  left: 20px;
+  font-size: 120px;
+  color: rgba(196,168,130,0.2);
+  font-family: var(--font-serif);
+  line-height: 1;
+}
+.space-desc {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: start;
+}
+.space-desc p {
+  font-size: 15px;
+  color: var(--charcoal);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+/* TEAM */
+.team-section { padding: 90px 40px; background: #ede6d3; }
+.team-inner { max-width: 1100px; margin: 0 auto; }
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 28px;
+  margin-top: 50px;
+}
+.team-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+.team-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.team-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--sage);
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-family: var(--font-serif);
+  color: var(--white);
+  font-weight: 300;
+}
+.team-name { font-family: var(--font-serif); font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+.team-role { font-size: 12px; color: var(--sage); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+.team-bio { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+@media (max-width: 768px) {
+  .story-intro-grid { grid-template-columns: 1fr; gap: 30px; }
+  .values-grid { grid-template-columns: 1fr; }
+  .space-desc { grid-template-columns: 1fr; gap: 0; }
+  .story-section, .space-section { padding: 60px 20px; }
+  .values-section, .team-section { padding: 60px 20px; }
+}
+</style>
+</head>
+<body>
+
+<div id="announcement-bar">
+  <div class="marquee-track">
+    <span>✦ Welcome to The Detox Club · Walkhu Galli, Lalitpur ✦ Open Daily 10:00 AM – 8:00 PM ✦</span>
+    <span>✦ Welcome to The Detox Club · Walkhu Galli, Lalitpur ✦ Open Daily 10:00 AM – 8:00 PM ✦</span>
+  </div>
+</div>
+
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo.webp" alt="Logo"/>
+    <div class="nav-logo-text">The Detox Club<span>Café · Collaboration · Calm</span></div>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="menu.html">Menu</a></li>
+    <li><a href="events.html">Events</a></li>
+    <li><a href="story.html" class="active">Our Story</a></li>
+    <li><a href="visit.html">Visit Us</a></li>
+    <li><a href="visit.html#reserve" class="nav-cta">Reserve a Seat</a></li>
+  </ul>
+  <div class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="story-hero">
+  <div class="story-hero-inner">
+    <h1>Born from a<br/><em>quiet longing</em><br/>for calm.</h1>
+    <p>The Detox Club began not as a business, but as a belief — that a place of true nourishment, quiet, and community could exist in the heart of Lalitpur.</p>
+  </div>
+</div>
+
+<!-- ORIGIN -->
+<section class="story-section reveal">
+  <span class="section-subtitle">The Origin</span>
+  <h2 class="section-title">How it began</h2>
+  <div class="section-divider"></div>
+  <div class="story-intro-grid">
+    <div class="story-intro-text">
+      <p>In 2026, a simple vision took root in Walkhu Galli — a café that would serve not just food and drink, but a feeling. A feeling of being truly present, nourished, and unhurried.</p>
+      <p>Every item on our menu was crafted with intention. Every corner of our space was designed to invite stillness. The Detox Club is not just where you eat — it's where you arrive.</p>
+      <p>We believe that what you consume shapes how you feel, and how you feel shapes who you become. So we begin each day asking: what does our community need today?</p>
+    </div>
+    <div class="story-intro-visual">
+      <img src="images/logo.webp" alt="The Detox Club"/>
+      <h3>The Detox Club</h3>
+      <p>A sanctuary for the senses.<br/>Walkhu Galli, Lalitpur, Nepal.<br/>Est. 2026.</p>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="values-section reveal">
+  <div class="values-inner">
+    <span class="section-subtitle">What We Stand For</span>
+    <h2 class="section-title">Our Core Values</h2>
+    <div class="section-divider"></div>
+    <div class="values-grid">
+      <div class="value-card reveal">
+        <div class="value-icon">🌿</div>
+        <div class="value-title">Intentional Nourishment</div>
+        <div class="value-desc">Every ingredient is chosen with care. We don't just feed — we restore. Real food, honest preparation, mindful sourcing.</div>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">☁️</div>
+        <div class="value-title">Radical Calm</div>
+        <div class="value-desc">In a world that never stops, we create a space that does. Quiet corners, unhurried service, an atmosphere designed to let you exhale.</div>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">🤝</div>
+        <div class="value-title">Genuine Community</div>
+        <div class="value-desc">This is a place to collaborate, to connect, to belong. We host events, welcome conversations, and nurture the neighborhood.</div>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">✨</div>
+        <div class="value-title">Honest Quality</div>
+        <div class="value-desc">No shortcuts. Every cup brewed to its best. Every plate assembled with pride. We believe quality is felt before it is seen.</div>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">🌱</div>
+        <div class="value-title">Seasonal & Local</div>
+        <div class="value-desc">We work with what the season gives us. Local produce, traditional recipes, a deep respect for the land we live on.</div>
+      </div>
+      <div class="value-card reveal">
+        <div class="value-icon">💚</div>
+        <div class="value-title">Inclusive Welcome</div>
+        <div class="value-desc">Everyone is welcome at our table. Dietary needs, different paces, quiet days or social ones — we make room for all of it.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPACE -->
+<section class="space-section reveal">
+  <span class="section-subtitle">The Space</span>
+  <h2 class="section-title">Where you arrive</h2>
+  <div class="section-divider"></div>
+  <div class="space-quote">A café that holds you the way a good book does — warmly, without hurry.</div>
+  <div class="space-desc">
+    <div>
+      <p>Tucked into Walkhu Galli, The Detox Club is designed to feel like an exhale. Soft light, warm tones, and the gentle sound of something brewing — always.</p>
+      <p>We have corners for solo contemplation, tables for quiet meetings, and an open energy for those who just want to feel less alone in the city.</p>
+    </div>
+    <div>
+      <p>The aesthetic is organic — warm parchment, sage greens, the kind of textures that remind you to slow down. Every detail was chosen to make you feel welcome.</p>
+      <p>Come with your journal. Come with your team. Come as you are. There is always a place for you here.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team-section reveal">
+  <div class="team-inner">
+    <span class="section-subtitle">The People</span>
+    <h2 class="section-title">Who makes it real</h2>
+    <div class="section-divider"></div>
+    <div class="team-grid">
+      <div class="team-card reveal">
+        <div class="team-avatar">F</div>
+        <div class="team-name">The Founder</div>
+        <div class="team-role">Vision & Heart</div>
+        <div class="team-bio">Built The Detox Club from a belief that calm, quality food, and community belong together.</div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-avatar">🌿</div>
+        <div class="team-name">The Kitchen</div>
+        <div class="team-role">Nourishment Team</div>
+        <div class="team-bio">Every plate is assembled with care. Our kitchen team believes food is a form of love.</div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-avatar">☕</div>
+        <div class="team-name">The Brew Bar</div>
+        <div class="team-role">Drinks & Elixirs</div>
+        <div class="team-bio">From the morning matcha to the evening bel elixir — each cup brewed to its fullest potential.</div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-avatar">🤝</div>
+        <div class="team-name">The Welcome</div>
+        <div class="team-role">Hospitality & Service</div>
+        <div class="team-bio">The faces at the door, the ones who remember your name. Warmth is their specialty.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOATING BUTTONS -->
+<div class="floating-buttons">
+  <a href="https://wa.me/9779849197952" class="float-btn float-btn-wa" target="_blank"><span class="float-btn-label">WhatsApp us</span><svg viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+  <a href="https://instagram.com/the.detoxclub" class="float-btn float-btn-ig" target="_blank"><span class="float-btn-label">Follow us</span><svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+  <a href="mailto:hello@thedetoxclub.com" class="float-btn float-btn-email"><span class="float-btn-label">Email us</span><svg viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></a>
+</div>
+
+<a href="dashboard.html" class="dashboard-subtle"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg></a>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><img src="images/logo.webp" alt="Logo"/><h3>The Detox Club</h3><p>A sanctuary for the senses.<br/>Est. 2026, Lalitpur</p></div>
+    <div class="footer-col"><h4>Navigate</h4><ul><li><a href="index.html">Home</a></li><li><a href="menu.html">Menu</a></li><li><a href="events.html">Events</a></li><li><a href="story.html">Our Story</a></li><li><a href="visit.html">Visit Us</a></li></ul></div>
+    <div class="footer-col"><h4>Visit</h4><p>Walkhu Galli<br/>Lalitpur 44600, Nepal<br/>10:00 AM – 8:00 PM Daily</p></div>
+    <div class="footer-col"><h4>Connect</h4><ul><li><a href="https://wa.me/9779849197952">WhatsApp</a></li><li><a href="https://instagram.com/the.detoxclub">Instagram</a></li><li><a href="mailto:hello@thedetoxclub.com">Email</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 The Detox Club</span><span>Made with 🌿 in Lalitpur</span></div>
+</footer>
+
+<script>
+window.addEventListener('scroll', () => { document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60); });
+document.getElementById('hamburger').addEventListener('click', () => { document.getElementById('nav-links').classList.toggle('open'); });
+const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);} }), {threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

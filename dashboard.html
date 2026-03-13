@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dashboard — The Detox Club</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{
+  --cream:#f5f0e4;--sage:#7a8c5e;--sage-dark:#5a6b42;
+  --charcoal:#2c2c1e;--tan:#c4a882;--tan-light:#ddc9a8;
+  --terracotta:#b5714a;--muted:#8a8470;
+  --font-serif:'Cormorant Garamond',Georgia,serif;
+  --font-sans:'DM Sans',sans-serif;
+  --sidebar:240px;
+  --shadow-lg:0 12px 48px rgba(44,44,30,0.16);
+  --tr:all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-sans);background:#1a1a10;color:var(--cream);min-height:100vh;overflow-x:hidden;}
+#login-screen{position:fixed;inset:0;background:var(--charcoal);display:flex;align-items:center;justify-content:center;z-index:9999;}
+.login-card{background:rgba(245,240,228,0.05);border:1px solid rgba(196,168,130,0.2);border-radius:24px;padding:48px 44px;width:380px;text-align:center;}
+.login-logo{width:84px;height:84px;border-radius:50%;object-fit:cover;margin:0 auto 20px;display:block;border:3px solid rgba(196,168,130,0.3);}
+.login-title{font-family:var(--font-serif);font-size:28px;font-weight:300;margin-bottom:6px;}
+.login-sub{font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:30px;}
+.login-input{width:100%;padding:12px 16px;border:1.5px solid rgba(196,168,130,0.2);border-radius:10px;background:rgba(255,253,244,0.06);color:var(--cream);font-family:var(--font-sans);font-size:14px;outline:none;margin-bottom:12px;transition:var(--tr);}
+.login-input:focus{border-color:var(--sage);}
+.login-input::placeholder{color:rgba(255,255,255,0.25);}
+.login-btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--sage);color:white;font-family:var(--font-sans);font-size:14px;font-weight:500;cursor:pointer;transition:var(--tr);}
+.login-btn:hover{background:var(--sage-dark);}
+.login-err{color:#e57373;font-size:13px;margin-top:10px;display:none;}
+.toast{position:fixed;top:20px;right:20px;z-index:10000;background:rgba(44,44,30,0.97);color:var(--cream);padding:14px 22px;border-radius:12px;font-size:13px;border-left:3px solid var(--sage);box-shadow:var(--shadow-lg);transform:translateX(120%);transition:transform 0.4s ease;max-width:320px;}
+.toast.show{transform:translateX(0);}
+.toast.error{border-left-color:#e57373;}
+#app{display:none;min-height:100vh;flex-direction:row;}
+.sidebar{width:var(--sidebar);flex-shrink:0;background:rgba(255,253,244,0.03);border-right:1px solid rgba(196,168,130,0.1);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar-brand{padding:22px 18px;border-bottom:1px solid rgba(196,168,130,0.1);display:flex;align-items:center;gap:12px;}
+.sidebar-brand img{width:38px;height:38px;border-radius:50%;object-fit:cover;}
+.sidebar-brand-text h3{font-family:var(--font-serif);font-size:15px;font-weight:400;}
+.sidebar-brand-text span{font-size:10px;color:var(--muted);letter-spacing:0.1em;}
+.fb-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);padding:8px 18px;}
+.fb-dot{width:7px;height:7px;border-radius:50%;background:#e57373;flex-shrink:0;}
+.fb-dot.ok{background:#81c784;}
+.sidebar-nav{padding:12px 10px;flex:1;}
+.nav-lbl{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);padding:14px 10px 6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;font-size:13px;color:rgba(245,240,228,0.65);transition:var(--tr);margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left;}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;fill:currentColor;opacity:0.7;}
+.nav-item:hover{background:rgba(255,253,244,0.07);color:var(--cream);}
+.nav-item.active{background:rgba(122,140,94,0.2);color:var(--cream);font-weight:500;}
+.sidebar-footer{padding:16px 18px;border-top:1px solid rgba(196,168,130,0.1);}
+.sidebar-footer a{font-size:12px;color:var(--muted);text-decoration:none;}
+.main{flex:1;overflow-y:auto;background:#1e1e14;}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(30,30,20,0.96);backdrop-filter:blur(10px);padding:14px 28px;border-bottom:1px solid rgba(196,168,130,0.1);display:flex;justify-content:space-between;align-items:center;}
+.topbar-title{font-family:var(--font-serif);font-size:21px;font-weight:300;}
+.topbar-right{display:flex;align-items:center;gap:14px;}
+.topbar-date{font-size:12px;color:var(--muted);}
+.logout-btn{padding:6px 14px;border:1px solid rgba(196,168,130,0.2);border-radius:20px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:var(--tr);font-family:var(--font-sans);}
+.logout-btn:hover{border-color:#e57373;color:#e57373;}
+.section-page{display:none;padding:28px 32px;animation:fadeIn 0.3s ease;}
+.section-page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;}}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{background:rgba(255,253,244,0.04);border:1px solid rgba(196,168,130,0.12);border-radius:14px;padding:20px 18px;}
+.stat-card.green{border-color:rgba(76,175,80,0.3);background:rgba(76,175,80,0.05);}
+.stat-card.red{border-color:rgba(229,115,115,0.3);background:rgba(229,115,115,0.05);}
+.stat-card.tan{border-color:rgba(196,168,130,0.3);background:rgba(196,168,130,0.05);}
+.stat-lbl{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.stat-val{font-family:var(--font-serif);font-size:30px;font-weight:300;}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+.card{background:rgba(255,253,244,0.04);border:1px solid rgba(196,168,130,0.12);border-radius:14px;padding:22px;margin-bottom:18px;}
+.card h3{font-family:var(--font-serif);font-size:20px;font-weight:400;margin-bottom:16px;}
+.card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.card-hdr h3{margin-bottom:0;}
+.ftabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.ftab{padding:5px 14px;border-radius:20px;border:1px solid rgba(196,168,130,0.2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:var(--tr);font-family:var(--font-sans);}
+.ftab:hover{background:rgba(255,253,244,0.07);}
+.ftab.active{background:var(--sage);color:white;border-color:var(--sage);}
+.chart-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:18px;}
+.chart-wrap{position:relative;height:240px;}
+.fg{margin-bottom:13px;}
+.fg label{display:block;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--tan);margin-bottom:5px;}
+.di,.ds,.dt{width:100%;padding:9px 13px;border:1.5px solid rgba(196,168,130,0.18);border-radius:8px;background:rgba(255,253,244,0.05);color:var(--cream);font-family:var(--font-sans);font-size:13px;outline:none;transition:var(--tr);resize:none;}
+.di:focus,.ds:focus,.dt:focus{border-color:var(--sage);}
+.di::placeholder,.dt::placeholder{color:rgba(255,255,255,0.22);}
+.ds option{background:#2c2c1e;}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn{padding:8px 18px;border-radius:8px;border:none;font-family:var(--font-sans);font-size:12px;font-weight:500;cursor:pointer;transition:var(--tr);display:inline-flex;align-items:center;gap:6px;}
+.btn:active{transform:scale(0.96);}
+.btn-p{background:var(--sage);color:white;}
+.btn-p:hover{background:var(--sage-dark);}
+.btn-s{background:rgba(255,253,244,0.07);color:var(--cream);border:1px solid rgba(196,168,130,0.2);}
+.btn-s:hover{background:rgba(255,253,244,0.12);}
+.btn-d{background:rgba(229,115,115,0.12);color:#e57373;border:1px solid rgba(229,115,115,0.2);}
+.btn-d:hover{background:rgba(229,115,115,0.22);}
+.btn-g{background:rgba(76,175,80,0.12);color:#81c784;border:1px solid rgba(76,175,80,0.2);}
+.btn-g:hover{background:rgba(76,175,80,0.22);}
+.btn-sm{padding:4px 11px;font-size:11px;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{text-align:left;padding:9px 13px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid rgba(196,168,130,0.12);}
+.tbl td{padding:11px 13px;border-bottom:1px solid rgba(196,168,130,0.07);color:rgba(245,240,228,0.85);vertical-align:middle;}
+.tbl tr:hover td{background:rgba(255,253,244,0.03);}
+.tbl img{width:42px;height:42px;border-radius:8px;object-fit:cover;}
+.empty{text-align:center;padding:40px;color:var(--muted);font-style:italic;font-family:var(--font-serif);font-size:18px;}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;}
+.bg{background:rgba(76,175,80,0.15);color:#81c784;}
+.br{background:rgba(229,115,115,0.15);color:#e57373;}
+.bt{background:rgba(196,168,130,0.15);color:var(--tan-light);}
+.upload-box{border:2px dashed rgba(196,168,130,0.22);border-radius:10px;padding:16px;text-align:center;position:relative;cursor:pointer;transition:var(--tr);}
+.upload-box:hover{border-color:var(--sage);}
+.upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-txt{font-size:12px;color:var(--muted);}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:14px;}
+.feat-item{border:2px solid rgba(196,168,130,0.15);border-radius:10px;overflow:hidden;cursor:pointer;transition:var(--tr);position:relative;}
+.feat-item:hover{border-color:var(--sage);}
+.feat-item.sel{border-color:var(--sage);box-shadow:0 0 0 1px var(--sage);}
+.feat-item img{width:100%;height:70px;object-fit:cover;}
+.feat-name{padding:5px 7px;font-size:11px;color:var(--cream);}
+.feat-chk{position:absolute;top:5px;right:5px;width:18px;height:18px;border-radius:50%;background:var(--sage);color:white;font-size:11px;display:none;align-items:center;justify-content:center;}
+.feat-item.sel .feat-chk{display:flex;}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.chip{padding:5px 13px;border-radius:20px;border:1px solid rgba(196,168,130,0.2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:var(--tr);font-family:var(--font-sans);}
+.chip:hover{background:rgba(255,253,244,0.08);color:var(--cream);}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:14px;}
+.gal-item{border-radius:10px;overflow:hidden;position:relative;aspect-ratio:1;background:rgba(255,253,244,0.05);border:1px solid rgba(196,168,130,0.1);}
+.gal-item img{width:100%;height:100%;object-fit:cover;}
+.gal-del{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;background:rgba(229,115,115,0.9);color:white;border:none;cursor:pointer;font-size:13px;opacity:0;transition:opacity 0.2s;display:flex;align-items:center;justify-content:center;}
+.gal-item:hover .gal-del{opacity:1;}
+.addon-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.atag{background:rgba(196,168,130,0.12);border:1px solid rgba(196,168,130,0.2);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--tan-light);display:flex;align-items:center;gap:6px;}
+.atag button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0;}
+.atag button:hover{color:#e57373;}
+@media(max-width:900px){.sidebar{display:none;}.stat-grid{grid-template-columns:1fr 1fr;}.chart-grid{grid-template-columns:1fr;}.section-page{padding:16px;}}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<div id="login-screen">
+  <div class="login-card">
+    <img src="images/logo.webp" class="login-logo"/>
+    <div class="login-title">Owner Dashboard</div>
+    <div class="login-sub">The Detox Club · Secure Access</div>
+    <input type="password" class="login-input" id="login-pass" placeholder="Enter your password" autofocus onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()">Enter Dashboard</button>
+    <div class="login-err" id="login-err">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<div id="app" style="display:none;flex-direction:row;min-height:100vh;">
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <img src="images/logo.webp"/>
+      <div class="sidebar-brand-text"><h3>Detox Club</h3><span>Owner Panel</span></div>
+    </div>
+    <div class="fb-status"><div class="fb-dot" id="fb-dot"></div><span id="fb-lbl">Loading…</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-lbl">Overview</div>
+      <button class="nav-item active" onclick="go('overview',this)"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Analytics</button>
+      <div class="nav-lbl">Manage</div>
+      <button class="nav-item" onclick="go('menu',this)"><svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>Menu Manager</button>
+      <button class="nav-item" onclick="go('events',this)"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Events</button>
+      <button class="nav-item" onclick="go('res',this)"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Reservations</button>
+      <button class="nav-item" onclick="go('log',this)"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Daily Log</button>
+      <button class="nav-item" onclick="go('community',this)"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Community Wall</button>
+      <button class="nav-item" onclick="go('gallery',this)"><svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>Gallery</button>
+      <div class="nav-lbl">Config</div>
+      <button class="nav-item" onclick="go('settings',this)"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>Settings</button>
+    </nav>
+    <div class="sidebar-footer"><a href="index.html">← Back to Website</a></div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Analytics Overview</div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbar-date"></div>
+        <button class="logout-btn" onclick="doLogout()">Log Out</button>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="section-page active" id="sec-overview">
+      <div class="stat-grid">
+        <div class="stat-card green"><div class="stat-lbl">Today's Income</div><div class="stat-val" id="s-inc">Rs. 0</div><div class="stat-sub">logged today</div></div>
+        <div class="stat-card red"><div class="stat-lbl">Today's Expenses</div><div class="stat-val" id="s-exp">Rs. 0</div><div class="stat-sub">logged today</div></div>
+        <div class="stat-card tan"><div class="stat-lbl">Net Profit</div><div class="stat-val" id="s-net">Rs. 0</div><div class="stat-sub">income − expenses</div></div>
+        <div class="stat-card"><div class="stat-lbl">Pending Reservations</div><div class="stat-val" id="s-res">0</div><div class="stat-sub">awaiting confirmation</div></div>
+      </div>
+      <div class="ftabs">
+        <button class="ftab active" onclick="setPeriod('today',this)">Today</button>
+        <button class="ftab" onclick="setPeriod('week',this)">This Week</button>
+        <button class="ftab" onclick="setPeriod('month',this)">This Month</button>
+        <button class="ftab" onclick="setPeriod('all',this)">All Time</button>
+      </div>
+      <div class="chart-grid">
+        <div class="card" style="padding:20px;"><h3>Income vs Expenses</h3><div class="chart-wrap"><canvas id="barChart"></canvas></div></div>
+        <div class="card" style="padding:20px;"><h3>Breakdown</h3><div class="chart-wrap"><canvas id="pieChart"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><h3>Recent Entries</h3>
+          <div class="btn-row"><button class="btn btn-s btn-sm" onclick="exportCSV()">CSV</button><button class="btn btn-s btn-sm" onclick="exportPDF()">PDF</button><button class="btn btn-s btn-sm" onclick="window.print()">Print</button></div>
+        </div>
+        <table class="tbl"><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Amount</th></tr></thead><tbody id="log-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- MENU -->
+    <div class="section-page" id="sec-menu">
+      <div class="card"><div class="card-hdr"><h3>Menu Items</h3><button class="btn btn-p" onclick="openMenuModal()">+ Add Item</button></div>
+        <table class="tbl"><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead><tbody id="menu-tbody"></tbody></table>
+      </div>
+      <div class="card"><h3>Featured Items on Homepage</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:4px;">Select up to 6 items shown in "Today's Favourites"</p>
+        <div class="feat-grid" id="feat-grid"></div>
+        <div style="margin-top:16px;"><button class="btn btn-p" onclick="saveFeatured()">Save Featured Items</button></div>
+      </div>
+    </div>
+
+    <!-- EVENTS -->
+    <div class="section-page" id="sec-events">
+      <div class="card"><div class="card-hdr"><h3>Events</h3><button class="btn btn-p" onclick="openEventModal()">+ Add Event</button></div>
+        <table class="tbl"><thead><tr><th>Image</th><th>Title</th><th>Date</th><th>Capacity</th><th>RSVPs</th><th>Status</th><th>Actions</th></tr></thead><tbody id="events-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- RESERVATIONS -->
+    <div class="section-page" id="sec-res">
+      <div class="card"><div class="card-hdr"><h3>Reservations</h3><button class="btn btn-s btn-sm" onclick="exportResCSV()">Export CSV</button></div>
+        <div class="ftabs">
+          <button class="ftab active" onclick="filterRes('all',this)">All</button>
+          <button class="ftab" onclick="filterRes('pending',this)">Pending</button>
+          <button class="ftab" onclick="filterRes('confirmed',this)">Confirmed</button>
+          <button class="ftab" onclick="filterRes('cancelled',this)">Cancelled</button>
+        </div>
+        <table class="tbl"><thead><tr><th>Name</th><th>Phone</th><th>Date</th><th>Time</th><th>People</th><th>Note</th><th>Status</th><th>Actions</th></tr></thead><tbody id="res-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- DAILY LOG -->
+    <div class="section-page" id="sec-log">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+        <div class="card"><h3>Log Income</h3>
+          <div class="fg"><label>Quick Presets</label>
+            <div class="chips">
+              <button class="chip" onclick="sf('inc-d','Dine-In Sales')">Dine-In Sales</button>
+              <button class="chip" onclick="sf('inc-d','Takeaway')">Takeaway</button>
+              <button class="chip" onclick="sf('inc-d','Event Revenue')">Event Revenue</button>
+              <button class="chip" onclick="sf('inc-d','Catering')">Catering</button>
+              <button class="chip" onclick="sf('inc-d','Other')">Other</button>
+            </div>
+          </div>
+          <div class="fg"><label>Description</label><input type="text" class="di" id="inc-d" placeholder="e.g. Morning sales"/></div>
+          <div class="fg"><label>Amount (Rs.)</label><input type="number" class="di" id="inc-a" placeholder="0"/></div>
+          <div class="fg"><label>Date</label><input type="date" class="di" id="inc-date"/></div>
+          <button class="btn btn-g" onclick="addLog('income')">+ Log Income</button>
+        </div>
+        <div class="card"><h3>Log Expense</h3>
+          <div class="fg"><label>Quick Presets</label>
+            <div class="chips">
+              <button class="chip" onclick="sf('exp-d','Ingredients')">Ingredients</button>
+              <button class="chip" onclick="sf('exp-d','Staff Wages')">Staff Wages</button>
+              <button class="chip" onclick="sf('exp-d','Utilities')">Utilities</button>
+              <button class="chip" onclick="sf('exp-d','Rent')">Rent</button>
+              <button class="chip" onclick="sf('exp-d','Supplies')">Supplies</button>
+              <button class="chip" onclick="sf('exp-d','Maintenance')">Maintenance</button>
+              <button class="chip" onclick="sf('exp-d','Other')">Other</button>
+            </div>
+          </div>
+          <div class="fg"><label>Description</label><input type="text" class="di" id="exp-d" placeholder="e.g. Vegetable purchase"/></div>
+          <div class="fg"><label>Amount (Rs.)</label><input type="number" class="di" id="exp-a" placeholder="0"/></div>
+          <div class="fg"><label>Date</label><input type="date" class="di" id="exp-date"/></div>
+          <button class="btn btn-d" onclick="addLog('expense')">+ Log Expense</button>
+        </div>
+      </div>
+      <div class="card"><div class="card-hdr"><h3>All Entries</h3>
+        <div class="btn-row"><button class="btn btn-s btn-sm" onclick="exportCSV()">CSV</button><button class="btn btn-s btn-sm" onclick="exportPDF()">PDF</button></div>
+      </div>
+        <table class="tbl"><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Amount</th><th></th></tr></thead><tbody id="fulllog-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- COMMUNITY -->
+    <div class="section-page" id="sec-community">
+      <div class="card"><div class="card-hdr"><h3>Community Wall Messages</h3></div>
+        <table class="tbl"><thead><tr><th>Name</th><th>Message</th><th>Date</th><th></th></tr></thead><tbody id="community-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="section-page" id="sec-gallery">
+      <div class="card"><h3>Add Photo</h3>
+        <div class="fr2">
+          <div>
+            <div class="fg"><label>Upload File</label><div class="upload-box"><input type="file" accept="image/*" onchange="handleGalFile(this)"/><div class="upload-txt">Click to upload</div></div></div>
+            <div style="font-size:11px;color:var(--muted);text-align:center;margin:8px 0;">— or —</div>
+            <div class="fg"><label>Paste URL</label><input type="url" class="di" id="gal-url" placeholder="https://…"/></div>
+          </div>
+          <div>
+            <div class="fg"><label>Caption</label><input type="text" class="di" id="gal-cap" placeholder="A moment at the club…"/></div>
+            <button class="btn btn-p" onclick="addGalItem()" style="margin-top:8px;">Add to Gallery</button>
+          </div>
+        </div>
+        <h3 style="margin-top:20px;">Photos</h3>
+        <div class="gal-grid" id="gal-grid"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="section-page" id="sec-settings">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+        <div class="card"><h3>Opening Hours</h3>
+          <div class="fg"><label>Opening Time</label><input type="time" class="di" id="set-open" value="10:00"/></div>
+          <div class="fg"><label>Closing Time</label><input type="time" class="di" id="set-close" value="20:00"/></div>
+          <button class="btn btn-p" onclick="saveSettings()">Save Hours</button>
+        </div>
+        <div class="card"><h3>Announcement Bar</h3>
+          <div class="fg"><label>Text</label><textarea class="dt" id="set-ann" rows="3" placeholder="✦ Welcome…"></textarea></div>
+          <button class="btn btn-p" onclick="saveSettings()">Save</button>
+        </div>
+        <div class="card"><h3>Promo Banners</h3>
+          <div class="fg"><label>Banner 1</label><input type="text" class="di" id="set-p1" placeholder="5% off combo…"/></div>
+          <div class="fg"><label>Banner 2</label><input type="text" class="di" id="set-p2" placeholder="Follow & tag…"/></div>
+          <button class="btn btn-p" onclick="saveSettings()">Save</button>
+        </div>
+        <div class="card"><h3>Change Password</h3>
+          <div class="fg"><label>Current Password</label><input type="password" class="di" id="cur-pw" placeholder="Current password"/></div>
+          <div class="fg"><label>New Password</label><input type="password" class="di" id="new-pw" placeholder="New password"/></div>
+          <button class="btn btn-p" onclick="changePassword()">Update Password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MENU MODAL -->
+<div id="menu-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:#2a2a1a;border:1px solid rgba(196,168,130,0.2);border-radius:20px;padding:32px;width:560px;max-height:90vh;overflow-y:auto;position:relative;">
+    <button onclick="closeMenuModal()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.08);border:none;color:var(--cream);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;">✕</button>
+    <h3 style="font-family:var(--font-serif);font-size:24px;font-weight:400;margin-bottom:20px;" id="mm-title">Add Menu Item</h3>
+    <input type="hidden" id="mm-id"/>
+    <div class="fr2">
+      <div class="fg"><label>Name</label><input type="text" class="di" id="mm-name" placeholder="e.g. Matcha"/></div>
+      <div class="fg"><label>Category</label><select class="ds" id="mm-cat"><option>Core Brews</option><option>Warm Detox</option><option>Cold Detox</option><option>Breakfast</option><option>Detox Lunch</option><option>Sweet Tooth</option></select></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label>Price</label><input type="text" class="di" id="mm-price" placeholder="Rs. 150"/></div>
+      <div class="fg"><label>Tagline</label><input type="text" class="di" id="mm-tag" placeholder="The Monk's Focus"/></div>
+    </div>
+    <div class="fg"><label>Description</label><textarea class="dt" id="mm-desc" rows="2" placeholder="Description…"></textarea></div>
+    <div class="fg"><label>Image</label>
+      <div class="upload-box" style="margin-bottom:8px;"><input type="file" accept="image/*" onchange="handleMenuImg(this)"/><div class="upload-txt">Upload image file</div></div>
+      <input type="url" class="di" id="mm-imgurl" placeholder="Or paste image URL…"/>
+      <img id="mm-preview" style="width:80px;height:80px;border-radius:8px;object-fit:cover;margin-top:8px;display:none;"/>
+    </div>
+    <div class="fg"><label>Add-Ons</label>
+      <div style="display:flex;gap:8px;"><input type="text" class="di" id="mm-addon" placeholder="e.g. Add Chicken +Rs.120" style="flex:1;"/><button class="btn btn-s" onclick="pushAddon()">Add</button></div>
+      <div class="addon-tags" id="addon-list"></div>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:16px;"><input type="checkbox" id="mm-soldout"/> Mark as Sold Out</label>
+    <div class="btn-row"><button class="btn btn-p" onclick="saveMenuItem()">Save Item</button><button class="btn btn-s" onclick="closeMenuModal()">Cancel</button></div>
+  </div>
+</div>
+
+<!-- EVENT MODAL -->
+<div id="event-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:#2a2a1a;border:1px solid rgba(196,168,130,0.2);border-radius:20px;padding:32px;width:560px;max-height:90vh;overflow-y:auto;position:relative;">
+    <button onclick="closeEventModal()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.08);border:none;color:var(--cream);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;">✕</button>
+    <h3 style="font-family:var(--font-serif);font-size:24px;font-weight:400;margin-bottom:20px;" id="em-title-h">Add Event</h3>
+    <input type="hidden" id="em-id"/>
+    <div class="fg"><label>Title</label><input type="text" class="di" id="em-title" placeholder="e.g. Morning Meditation"/></div>
+    <div class="fr2">
+      <div class="fg"><label>Date</label><input type="date" class="di" id="em-date"/></div>
+      <div class="fg"><label>Time</label><input type="time" class="di" id="em-time"/></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label>Capacity</label><input type="number" class="di" id="em-cap" placeholder="30"/></div>
+      <div class="fg"><label>Status</label><select class="ds" id="em-status"><option value="upcoming">Upcoming</option><option value="past">Past</option></select></div>
+    </div>
+    <div class="fg"><label>Description</label><textarea class="dt" id="em-desc" rows="3" placeholder="Describe the event…"></textarea></div>
+    <div class="fg"><label>Image</label>
+      <div class="upload-box" style="margin-bottom:8px;"><input type="file" accept="image/*" onchange="handleEvImg(this)"/><div class="upload-txt">Upload image file</div></div>
+      <input type="url" class="di" id="em-imgurl" placeholder="Or paste image URL…"/>
+      <img id="em-preview" style="width:80px;height:80px;border-radius:8px;object-fit:cover;margin-top:8px;display:none;"/>
+    </div>
+    <div class="btn-row"><button class="btn btn-p" onclick="saveEvent()">Save Event</button><button class="btn btn-s" onclick="closeEventModal()">Cancel</button></div>
+  </div>
+</div>
+
+<!-- Firebase Compat (works by double-clicking files directly) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+
+const FC = {
+  apiKey:"AIzaSyDY2pN3MaabGoB8C30alX9r5azTjo0OQj8",
+  authDomain:"detoxclub-dashboard.firebaseapp.com",
+  projectId:"detoxclub-dashboard",
+  storageBucket:"detoxclub-dashboard.firebasestorage.app",
+  messagingSenderId:"443733326967",
+  appId:"1:443733326967:web:70fc6de77f8fac04aa5a72",
+  measurementId:"G-0MZK8FDNYL"
+};
+
+// ── FIREBASE COMPAT INIT ──
+let db = null;
+try {
+  firebase.initializeApp(FC);
+  db = firebase.firestore();
+  // Test connection
+  db.collection('settings').doc('ping').get().then(() => {
+    document.getElementById('fb-dot').classList.add('ok');
+    document.getElementById('fb-lbl').textContent = 'Firebase connected ✓';
+  }).catch(() => {
+    document.getElementById('fb-lbl').textContent = 'Saved locally ✓';
+    document.getElementById('fb-dot').style.background = '#ffd54f';
+  });
+} catch(e) {
+  document.getElementById('fb-lbl').textContent = 'Saved locally ✓';
+  document.getElementById('fb-dot').style.background = '#ffd54f';
+}
+
+// ── DATA LAYER: Firebase + localStorage fallback ──
+// localStorage is the primary store when file:// is used
+// Firebase syncs when online via http://
+
+function lsGet(col, id) {
+  try {
+    if (id) {
+      const all = JSON.parse(localStorage.getItem('dc_' + col) || '[]');
+      return all.find(x => x._id === id) || null;
+    }
+    return JSON.parse(localStorage.getItem('dc_' + col) || '[]');
+  } catch { return id ? null : []; }
+}
+function lsSet(col, data) {
+  try { localStorage.setItem('dc_' + col, JSON.stringify(data)); } catch {}
+}
+function lsAdd(col, data) {
+  const arr = lsGet(col);
+  const item = { _id: 'ls_' + Date.now() + '_' + Math.random().toString(36).slice(2), ...data };
+  arr.push(item);
+  lsSet(col, arr);
+  return item._id;
+}
+function lsUpdate(col, id, data) {
+  const arr = lsGet(col);
+  const i = arr.findIndex(x => x._id === id);
+  if (i >= 0) { arr[i] = { ...arr[i], ...data }; lsSet(col, arr); }
+}
+function lsDel(col, id) {
+  lsSet(col, lsGet(col).filter(x => x._id !== id));
+}
+function lsSaveOne(col, id, data) {
+  localStorage.setItem('dc_' + col + '_' + id, JSON.stringify({ _id: id, ...data }));
+}
+function lsGetOne(col, id) {
+  try { return JSON.parse(localStorage.getItem('dc_' + col + '_' + id)); } catch { return null; }
+}
+
+const getAll = async col => {
+  if (db) {
+    try {
+      const s = await db.collection(col).get();
+      const data = s.docs.map(d => ({ _id: d.id, ...d.data() }));
+      lsSet(col, data); // cache locally
+      return data;
+    } catch(e) {}
+  }
+  return lsGet(col);
+};
+const getOne = async (col, id) => {
+  if (db) {
+    try {
+      const s = await db.collection(col).doc(id).get();
+      if (s.exists) { const d = { _id: s.id, ...s.data() }; lsSaveOne(col, id, d); return d; }
+      return null;
+    } catch(e) {}
+  }
+  return lsGetOne(col, id) || lsGet(col).find(x => x._id === id) || null;
+};
+const save = async (col, id, data) => {
+  const clean = JSON.parse(JSON.stringify(data));
+  lsSaveOne(col, id, clean); // always save locally first
+  if (db) {
+    try { await db.collection(col).doc(id).set({ ...clean, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }); } catch(e) {}
+  }
+};
+const add = async (col, data) => {
+  const clean = JSON.parse(JSON.stringify(data));
+  const localId = lsAdd(col, clean); // save locally
+  if (db) {
+    try {
+      const r = await db.collection(col).add({ ...clean, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      // update local record with firebase id
+      const arr = lsGet(col);
+      const i = arr.findIndex(x => x._id === localId);
+      if (i >= 0) { arr[i]._id = r.id; lsSet(col, arr); }
+      return r.id;
+    } catch(e) {}
+  }
+  return localId;
+};
+const del = async (col, id) => {
+  lsDel(col, id);
+  if (db) { try { await db.collection(col).doc(id).delete(); } catch(e) {} }
+};
+const upd = async (col, id, data) => {
+  lsUpdate(col, id, data);
+  if (db) { try { await db.collection(col).doc(id).update(data); } catch(e) {} }
+};
+
+// ── AUTH ──
+let pw = 'detox2026';
+window.doLogin = async () => {
+  const p = document.getElementById('login-pass').value;
+  const auth = await getOne('settings','auth');
+  if(auth?.password) pw = auth.password;
+  if(p===pw){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    const W=['🌿 Good to see you. The club is in good hands.','☕ Welcome back. Ready to make today great?','✦ Your space awaits. Let\'s make it shine.','🌱 Another day to nourish and create.'];
+    toast(W[Math.floor(Math.random()*W.length)]);
+    init();
+  } else {
+    document.getElementById('login-err').style.display='block';
+    document.getElementById('login-pass').value='';
+  }
+};
+window.doLogout = () => {
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-pass').value='';
+  document.getElementById('login-err').style.display='none';
+};
+window.changePassword = async () => {
+  const cur=document.getElementById('cur-pw').value, nw=document.getElementById('new-pw').value.trim();
+  if(cur!==pw){toast('Current password incorrect.','error');return;}
+  if(!nw){toast('New password cannot be empty.','error');return;}
+  pw=nw; await save('settings','auth',{password:nw});
+  document.getElementById('cur-pw').value=''; document.getElementById('new-pw').value='';
+  toast('✦ Password updated in Firebase.');
+};
+
+// ── TOAST / UTILS ──
+window.toast = (msg,type='') => {
+  const t=document.getElementById('toast'); t.textContent=msg; t.className='toast'+(type?' '+type:''); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+};
+window.sf = (id,v) => document.getElementById(id).value=v;
+const dl = (c,f,t) => { const b=new Blob([c],{type:t}),a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=f; a.click(); };
+
+// ── NAV ──
+const TITLES = {overview:'Analytics Overview',menu:'Menu Manager',events:'Events',res:'Reservations',log:'Daily Log',community:'Community Wall',gallery:'Gallery',settings:'Settings'};
+window.go = (id,btn) => {
+  document.querySelectorAll('.section-page').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  document.getElementById('topbar-title').textContent=TITLES[id]||id;
+  const m={overview:loadAnalytics,menu:()=>{loadMenuTable();loadFeatGrid();},events:loadEventsTable,res:()=>loadRes('all'),log:()=>{setDates();loadFullLog();},community:loadCommunity,gallery:loadGallery,settings:loadSettings};
+  if(m[id]) m[id]();
+};
+
+// ── INIT ──
+async function init() {
+  document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('en-NP',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  await seedMenu();
+  loadAnalytics();
+}
+
+// ── DEFAULT MENU SEED ──
+const MENU_DEFAULTS = [
+  {id:'mint-black',name:'Mint Black Tea',tagline:'Clarity',cat:'Core Brews',price:'Rs. 50',priceNum:50,desc:'Cool mint meets bold black tea.',img:'images/mint-black.jpg',addons:[],soldOut:false},
+  {id:'masala-tea',name:'Masala Tea',tagline:'A Symphony',cat:'Core Brews',price:'Rs. 60',priceNum:60,desc:'A symphony of spices.',img:'images/masala-tea.jpg',addons:[],soldOut:false},
+  {id:'coffee',name:'Traditional Coffee',tagline:'The Anchor',cat:'Core Brews',price:'Rs. 100 / 150',priceNum:100,desc:'Rich, grounding, honest.',img:'images/coffee.jpg',addons:['With Milk +Rs.50'],soldOut:false},
+  {id:'english-tea',name:'English Breakfast Tea',tagline:'The Classic',cat:'Core Brews',price:'Rs. 150',priceNum:150,desc:'A cup that never lets you down.',img:'images/english-tea.jpg',addons:[],soldOut:false},
+  {id:'kaadaa',name:'Kaa-daa',tagline:'The Rejuvenation',cat:'Warm Detox',price:'Rs. 150',priceNum:150,desc:'Sacred spice blend.',img:'images/kaadaa.jpg',addons:[],soldOut:false},
+  {id:'golden-milk',name:'Golden Mountain Milk',tagline:'The Healing Light',cat:'Warm Detox',price:'Rs. 150',priceNum:150,desc:'Turmeric warmth in a glass.',img:'images/golden-milk.jpg',addons:[],soldOut:false},
+  {id:'lemon-ginger',name:'Hot Lemon Ginger Honey',tagline:'Simplicity',cat:'Warm Detox',price:'Rs. 150',priceNum:150,desc:'Bright, alive, and cleansing.',img:'images/lemon-ginger.jpg',addons:[],soldOut:false},
+  {id:'apple-spice',name:'Apple Spice Brew',tagline:'Nostalgia',cat:'Warm Detox',price:'Rs. 150',priceNum:150,desc:'Autumn warmth, always.',img:'images/apple-spice.jpg',addons:[],soldOut:false},
+  {id:'bel-elixir',name:'Bel Elixir',tagline:'Patience',cat:'Cold Detox',price:'Rs. 300',priceNum:300,desc:'A cooling ancient remedy.',img:'images/bel-elixir.jpg',addons:[],soldOut:false},
+  {id:'chlorophyll-juice',name:'Chlorophyll Green Juice',tagline:'Liquid Sunlight',cat:'Cold Detox',price:'Rs. 300',priceNum:300,desc:'Pure alive and green.',img:'images/chlorophyll-juice.jpg',addons:[],soldOut:false},
+  {id:'abc-vitality',name:'ABC Vitality',tagline:'Vitality',cat:'Cold Detox',price:'Rs. 300',priceNum:300,desc:'Apple Beet Carrot.',img:'images/abc-vitality.jpg',addons:[],soldOut:false},
+  {id:'matcha',name:'Matcha',tagline:"The Monk's Focus",cat:'Cold Detox',price:'Rs. 350',priceNum:350,desc:'Ceremonial grade matcha.',img:'images/matcha.webp',addons:['Extra Shot +Rs.50'],soldOut:false},
+  {id:'detox-breakfast',name:'Detox Breakfast',tagline:'The All-Morning',cat:'Breakfast',price:'Rs. 400 + 120',priceNum:400,desc:'Brown toast, mushrooms, veggies, fruits, eggs.',img:'images/detox-breakfast.jpg',addons:['Add Chicken +Rs.120'],soldOut:false},
+  {id:'detox-fruity-pancake',name:'Detox Fruity Pancakes',tagline:'Gentle Indulgence',cat:'Breakfast',price:'Rs. 250 + 100',priceNum:250,desc:'Pancakes with maple cream fruits.',img:'images/detox-fruity-pancake.jpg',addons:['Add Yogurt +Rs.70','Add Cream +Rs.100'],soldOut:false},
+  {id:'detox-meal',name:'Detox Meal',tagline:'Grounded Nourishment',cat:'Detox Lunch',price:'Rs. 350 + 120',priceNum:350,desc:'Rice mushrooms spinach sesame.',img:'images/detox-meal.jpg',addons:['Add Chicken +Rs.120'],soldOut:false},
+  {id:'detox-bake',name:'Detox Bake',tagline:'Earth & Oven',cat:'Detox Lunch',price:'Rs. 250 + 120',priceNum:250,desc:'Baked sweet potato with veggies.',img:'images/detox-bake.jpg',addons:['Add Chicken +Rs.120'],soldOut:false},
+  {id:'detox-mash',name:'Detox Mash',tagline:'The Soften',cat:'Detox Lunch',price:'Rs. 350',priceNum:350,desc:'Mashed potatoes cauli sauté veggies.',img:'images/detox-mash.jpg',addons:['Add Chicken +Rs.120'],soldOut:false},
+  {id:'lunch-bowl',name:'Detox Lunch Bowl',tagline:'Complete',cat:'Detox Lunch',price:'Rs. 350',priceNum:350,desc:'Rice chicken mushroom potato spinach sesame.',img:'images/lunch-bowl.jpg',addons:[],soldOut:false},
+  {id:'orange-magic',name:'Orange Magic',tagline:'Sunshine',cat:'Sweet Tooth',price:'Rs. 150',priceNum:150,desc:'Orange zest and sweetness.',img:'images/orange-magic.jpg',addons:['Add Cream +Rs.100'],soldOut:false},
+  {id:'strawberry-angels',name:'Strawberry Angels',tagline:'Light as Clouds',cat:'Sweet Tooth',price:'Rs. 150',priceNum:150,desc:'Strawberries cream joy.',img:'images/strawberry-angels.jpg',addons:['Add Extra Fruits +Rs.100'],soldOut:false},
+  {id:'apple-melts',name:'Apple Melts',tagline:'Pure Comfort',cat:'Sweet Tooth',price:'Rs. 150',priceNum:150,desc:'Warm apple caramel.',img:'images/apple-melts.jpg',addons:['Add Cream +Rs.100'],soldOut:false},
+];
+
+async function seedMenu() {
+  const ex = await getAll('menu');
+  if(ex.length===0) {
+    for(const item of MENU_DEFAULTS) await save('menu',item.id,item);
+    toast('✦ Default menu loaded!');
+  }
+}
+
+// ── ANALYTICS ──
+let charts={}, period='today';
+window.setPeriod = (p,btn) => { period=p; document.querySelectorAll('#sec-overview .ftab').forEach(b=>b.classList.remove('active')); if(btn)btn.classList.add('active'); loadAnalytics(); };
+
+async function loadAnalytics() {
+  const [logs,res] = await Promise.all([getAll('logs'),getAll('reservations')]);
+  const now = new Date();
+  const inPeriod = l => {
+    const d=new Date(l.date);
+    if(period==='today') return d.toDateString()===now.toDateString();
+    if(period==='week'){const s=new Date(now);s.setDate(now.getDate()-7);return d>=s;}
+    if(period==='month') return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    return true;
+  };
+  const todayLogs=logs.filter(l=>new Date(l.date).toDateString()===now.toDateString());
+  const fl=logs.filter(inPeriod);
+  const sum=(arr,t)=>arr.filter(l=>l.type===t).reduce((s,l)=>s+Number(l.amount),0);
+  document.getElementById('s-inc').textContent='Rs. '+sum(todayLogs,'income').toLocaleString();
+  document.getElementById('s-exp').textContent='Rs. '+sum(todayLogs,'expense').toLocaleString();
+  document.getElementById('s-net').textContent='Rs. '+(sum(todayLogs,'income')-sum(todayLogs,'expense')).toLocaleString();
+  document.getElementById('s-res').textContent=res.filter(r=>!r.status||r.status==='pending').length;
+  const grp={};
+  fl.forEach(l=>{const d=new Date(l.date).toLocaleDateString('en-NP',{month:'short',day:'numeric'});if(!grp[d])grp[d]={income:0,expense:0};grp[d][l.type]+=Number(l.amount);});
+  const labels=Object.keys(grp).slice(-12);
+  if(charts.bar) charts.bar.destroy();
+  charts.bar=new Chart(document.getElementById('barChart'),{type:'bar',data:{labels,datasets:[{label:'Income',data:labels.map(d=>grp[d].income||0),backgroundColor:'rgba(122,140,94,0.75)',borderRadius:6},{label:'Expenses',data:labels.map(d=>grp[d].expense||0),backgroundColor:'rgba(181,113,74,0.75)',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'rgba(245,240,228,0.7)',font:{family:'DM Sans',size:11}}}},scales:{x:{ticks:{color:'rgba(245,240,228,0.5)',font:{size:10}},grid:{color:'rgba(196,168,130,0.06)'}},y:{ticks:{color:'rgba(245,240,228,0.5)',font:{size:10}},grid:{color:'rgba(196,168,130,0.06)'}}}}});
+  const inc=sum(fl,'income'),exp=sum(fl,'expense');
+  if(charts.pie) charts.pie.destroy();
+  charts.pie=new Chart(document.getElementById('pieChart'),{type:'doughnut',data:{labels:['Income','Expenses'],datasets:[{data:[inc||1,exp||1],backgroundColor:['rgba(122,140,94,0.8)','rgba(181,113,74,0.8)'],borderColor:'transparent'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'rgba(245,240,228,0.7)',font:{family:'DM Sans',size:11}}}}}});
+  const recent=[...fl].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,15);
+  document.getElementById('log-tbody').innerHTML=recent.length?recent.map(l=>`<tr><td>${new Date(l.date).toLocaleDateString('en-NP')}</td><td><span class="badge ${l.type==='income'?'bg':'br'}">${l.type}</span></td><td>${l.desc}</td><td style="font-weight:500;color:${l.type==='income'?'#81c784':'#e57373'}">Rs. ${Number(l.amount).toLocaleString()}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No entries yet</td></tr>';
+}
+
+// ── MENU ──
+async function loadMenuTable() {
+  const menu=await getAll('menu');
+  document.getElementById('menu-tbody').innerHTML=menu.map(item=>`<tr>
+    <td><img src="${item.img}" onerror="this.style.background='#3a3a28';this.src=''"/></td>
+    <td style="font-weight:500;">${item.name}</td>
+    <td><span class="badge bt">${item.cat}</span></td>
+    <td>${item.price}</td>
+    <td><span class="badge ${item.soldOut?'br':'bg'}">${item.soldOut?'Sold Out':'Available'}</span></td>
+    <td><div style="display:flex;gap:6px;">
+      <button class="btn btn-s btn-sm" onclick="editMenu('${item._id}')">Edit</button>
+      <button class="btn btn-sm ${item.soldOut?'btn-g':'btn-d'}" onclick="toggleSO('${item._id}',${!item.soldOut})">${item.soldOut?'Mark Available':'Sold Out'}</button>
+      <button class="btn btn-d btn-sm" onclick="delMenu('${item._id}')">Delete</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+window.toggleSO = async (id,v) => { await upd('menu',id,{soldOut:v}); loadMenuTable(); loadFeatGrid(); toast(`✦ Item ${v?'marked sold out':'now available'}.`); };
+window.delMenu = async id => { if(!confirm('Delete this item?'))return; await del('menu',id); loadMenuTable(); loadFeatGrid(); toast('✦ Item deleted from Firebase.'); };
+
+async function loadFeatGrid() {
+  const [menu,settings]=await Promise.all([getAll('menu'),getOne('settings','main')]);
+  const sel=settings?.featuredIds||['matcha','detox-breakfast','strawberry-angels'];
+  document.getElementById('feat-grid').innerHTML=menu.map(item=>`<div class="feat-item ${sel.includes(item._id)?'sel':''}" onclick="toggleFeat('${item._id}',this)">
+    <img src="${item.img}" onerror="this.style.background='#3a3a28'"/>
+    <div class="feat-name">${item.name}</div>
+    <div class="feat-chk">✓</div>
+  </div>`).join('');
+}
+
+window.toggleFeat = (id,el) => { el.classList.toggle('sel'); el.querySelector('.feat-chk').style.display=el.classList.contains('sel')?'flex':'none'; };
+window.saveFeatured = async () => {
+  const ids=[...document.querySelectorAll('.feat-item.sel')].map(el=>{const m=(el.getAttribute('onclick')||'').match(/'([^']+)'/);return m?m[1]:null;}).filter(Boolean);
+  if(ids.length>6){toast('Max 6 featured items.','error');return;}
+  const s=await getOne('settings','main')||{};
+  s.featuredIds=ids; await save('settings','main',s);
+  toast('✦ Featured items saved to Firebase!');
+};
+
+// Menu modal
+let addons=[],menuImg='';
+window.openMenuModal = () => { addons=[];menuImg='';document.getElementById('mm-title').textContent='Add Menu Item';document.getElementById('mm-id').value='';['mm-name','mm-price','mm-tag','mm-desc','mm-imgurl'].forEach(id=>document.getElementById(id).value='');document.getElementById('mm-cat').value='Core Brews';document.getElementById('mm-soldout').checked=false;document.getElementById('mm-preview').style.display='none';renderAddons();document.getElementById('menu-modal').style.display='flex'; };
+window.editMenu = async id => {
+  const item=await getOne('menu',id); if(!item)return;
+  document.getElementById('mm-title').textContent='Edit Menu Item'; document.getElementById('mm-id').value=id;
+  document.getElementById('mm-name').value=item.name; document.getElementById('mm-cat').value=item.cat;
+  document.getElementById('mm-price').value=item.price; document.getElementById('mm-tag').value=item.tagline||'';
+  document.getElementById('mm-desc').value=item.desc; document.getElementById('mm-imgurl').value=item.img||'';
+  document.getElementById('mm-soldout').checked=item.soldOut||false;
+  addons=[...(item.addons||[])]; menuImg=item.img||'';
+  const p=document.getElementById('mm-preview'); if(item.img){p.src=item.img;p.style.display='block';}
+  renderAddons(); document.getElementById('menu-modal').style.display='flex';
+};
+window.closeMenuModal = () => document.getElementById('menu-modal').style.display='none';
+window.handleMenuImg = input => { if(!input.files[0])return; const r=new FileReader(); r.onload=e=>{menuImg=e.target.result;const p=document.getElementById('mm-preview');p.src=menuImg;p.style.display='block';}; r.readAsDataURL(input.files[0]); };
+window.pushAddon = () => { const v=document.getElementById('mm-addon').value.trim(); if(!v)return; addons.push(v); document.getElementById('mm-addon').value=''; renderAddons(); };
+window.removeAddon = i => { addons.splice(i,1); renderAddons(); };
+function renderAddons(){ document.getElementById('addon-list').innerHTML=addons.map((a,i)=>`<div class="atag">${a}<button onclick="removeAddon(${i})">×</button></div>`).join(''); }
+window.saveMenuItem = async () => {
+  const name=document.getElementById('mm-name').value.trim(), price=document.getElementById('mm-price').value.trim();
+  if(!name||!price){toast('Name and price required.','error');return;}
+  const editId=document.getElementById('mm-id').value;
+  const item={id:editId||name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')+'-'+Date.now(),name,cat:document.getElementById('mm-cat').value,price,priceNum:parseInt(price.replace(/[^0-9]/g,''))||0,tagline:document.getElementById('mm-tag').value,desc:document.getElementById('mm-desc').value,img:menuImg||document.getElementById('mm-imgurl').value.trim()||'',addons,soldOut:document.getElementById('mm-soldout').checked};
+  await save('menu',editId||item.id,item);
+  closeMenuModal(); loadMenuTable(); loadFeatGrid();
+  toast('✦ Menu item saved to Firebase!');
+};
+
+// ── EVENTS ──
+async function loadEventsTable() {
+  const [events,rsvps]=await Promise.all([getAll('events'),getAll('rsvps')]);
+  document.getElementById('events-tbody').innerHTML=events.length?events.map(ev=>{
+    const n=rsvps.filter(r=>r.eventId===ev._id).length;
+    return `<tr>
+      <td>${ev.image?`<img src="${ev.image}" onerror="this.style.background='#3a3a28'"/>`:'<div style="width:42px;height:42px;border-radius:8px;background:#3a3a28;display:flex;align-items:center;justify-content:center;">🌿</div>'}</td>
+      <td style="font-weight:500;">${ev.title}</td><td>${ev.date||'TBA'}</td><td>${ev.capacity||30}</td><td>${n}</td>
+      <td><span class="badge ${ev.isPast?'bt':'bg'}">${ev.isPast?'Past':'Upcoming'}</span></td>
+      <td><div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-s btn-sm" onclick="editEvent('${ev._id}')">Edit</button>
+        <button class="btn btn-s btn-sm" onclick="viewRsvps('${ev._id}')">RSVPs (${n})</button>
+        <button class="btn btn-d btn-sm" onclick="delEvent('${ev._id}')">Delete</button>
+      </div></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="7" class="empty">No events yet</td></tr>';
+}
+
+let evImg='';
+window.openEventModal = () => { evImg='';document.getElementById('em-title-h').textContent='Add Event';document.getElementById('em-id').value='';['em-title','em-date','em-time','em-desc','em-imgurl'].forEach(id=>document.getElementById(id).value='');document.getElementById('em-cap').value=30;document.getElementById('em-status').value='upcoming';document.getElementById('em-preview').style.display='none';document.getElementById('event-modal').style.display='flex'; };
+
+// Fix: em-title is the input, em-title-h doesn't exist — use label in header
+window.openEventModal = () => { evImg='';document.getElementById('em-title').value='';['em-date','em-time','em-desc','em-imgurl'].forEach(id=>document.getElementById(id).value='');document.getElementById('em-cap').value=30;document.getElementById('em-status').value='upcoming';document.getElementById('em-preview').style.display='none';document.getElementById('event-modal').style.display='flex'; };
+window.editEvent = async id => {
+  const ev=await getOne('events',id); if(!ev)return;
+  document.getElementById('em-id').value=id;
+  document.getElementById('em-title').value=ev.title; document.getElementById('em-date').value=ev.date||'';
+  document.getElementById('em-time').value=ev.time||''; document.getElementById('em-cap').value=ev.capacity||30;
+  document.getElementById('em-status').value=ev.isPast?'past':'upcoming'; document.getElementById('em-desc').value=ev.description||'';
+  document.getElementById('em-imgurl').value=ev.image||''; evImg=ev.image||'';
+  const p=document.getElementById('em-preview'); if(ev.image){p.src=ev.image;p.style.display='block';}else p.style.display='none';
+  document.getElementById('event-modal').style.display='flex';
+};
+window.closeEventModal = () => document.getElementById('event-modal').style.display='none';
+window.handleEvImg = input => { if(!input.files[0])return; const r=new FileReader(); r.onload=e=>{evImg=e.target.result;const p=document.getElementById('em-preview');p.src=evImg;p.style.display='block';}; r.readAsDataURL(input.files[0]); };
+window.saveEvent = async () => {
+  const title=document.getElementById('em-title').value.trim(); if(!title){toast('Title required.','error');return;}
+  const editId=document.getElementById('em-id').value;
+  const ev={title,date:document.getElementById('em-date').value,time:document.getElementById('em-time').value,capacity:parseInt(document.getElementById('em-cap').value)||30,isPast:document.getElementById('em-status').value==='past',description:document.getElementById('em-desc').value,image:evImg||document.getElementById('em-imgurl').value.trim()||''};
+  await save('events',editId||'ev-'+Date.now(),ev);
+  closeEventModal(); loadEventsTable(); toast('✦ Event saved to Firebase!');
+};
+window.delEvent = async id => { if(!confirm('Delete this event?'))return; await del('events',id); loadEventsTable(); toast('✦ Event deleted.'); };
+window.viewRsvps = async eventId => {
+  const rsvps=await getAll('rsvps'); const ev=rsvps.filter(r=>r.eventId===eventId);
+  if(!ev.length){alert('No RSVPs yet.');return;}
+  alert('RSVPs:\n\n'+ev.map((r,i)=>`${i+1}. ${r.name} | ${r.phone} | ${r.count} ppl | ${r.email||'—'} | ${r.note||'—'}`).join('\n'));
+};
+
+// ── RESERVATIONS ──
+async function loadRes(filter) {
+  let res=await getAll('reservations');
+  res.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(filter!=='all') res=res.filter(r=>(r.status||'pending')===filter);
+  document.getElementById('res-tbody').innerHTML=res.length?res.map(r=>`<tr>
+    <td style="font-weight:500;">${r.name}</td>
+    <td><a href="https://wa.me/${(r.phone||'').replace(/\D/g,'')}" target="_blank" style="color:var(--sage);">${r.phone}</a></td>
+    <td>${r.date||'—'}</td><td>${r.time||'—'}</td><td>${r.count||'—'}</td>
+    <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.note||'—'}</td>
+    <td><span class="badge ${r.status==='confirmed'?'bg':r.status==='cancelled'?'br':'bt'}">${r.status||'pending'}</span></td>
+    <td><div style="display:flex;gap:5px;">
+      <button class="btn btn-g btn-sm" onclick="updRes('${r._id}','confirmed')">Confirm</button>
+      <button class="btn btn-d btn-sm" onclick="updRes('${r._id}','cancelled')">Cancel</button>
+    </div></td>
+  </tr>`).join(''):'<tr><td colspan="8" class="empty">No reservations</td></tr>';
+}
+window.filterRes = (f,btn) => { document.querySelectorAll('#sec-res .ftab').forEach(b=>b.classList.remove('active')); if(btn)btn.classList.add('active'); loadRes(f); };
+window.updRes = async (id,status) => { await upd('reservations',id,{status}); loadRes('all'); toast(`✦ Reservation ${status}.`); };
+window.exportResCSV = async () => {
+  const res=await getAll('reservations'); if(!res.length){toast('Nothing to export.','error');return;}
+  dl(['Name,Phone,Email,Date,Time,People,Note,Status',...res.map(r=>[r.name,r.phone,r.email,r.date,r.time,r.count,r.note,r.status].map(v=>`"${v||''}"`).join(','))].join('\n'),'detoxclub-reservations.csv','text/csv');
+  toast('✦ Exported.');
+};
+
+// ── DAILY LOG ──
+function setDates(){ const t=new Date().toISOString().split('T')[0]; ['inc-date','exp-date'].forEach(id=>{if(!document.getElementById(id).value)document.getElementById(id).value=t;}); }
+window.addLog = async type => {
+  const d=document.getElementById(type==='income'?'inc-d':'exp-d').value.trim();
+  const a=document.getElementById(type==='income'?'inc-a':'exp-a').value;
+  const date=document.getElementById(type==='income'?'inc-date':'exp-date').value;
+  if(!d||!a||!date){toast('Fill all fields.','error');return;}
+  await add('logs',{type,desc:d,amount:parseFloat(a),date});
+  document.getElementById(type==='income'?'inc-a':'exp-a').value='';
+  document.getElementById(type==='income'?'inc-d':'exp-d').value='';
+  loadFullLog(); loadAnalytics();
+  toast(`✦ Rs.${a} ${type} saved to Firebase!`);
+};
+async function loadFullLog() {
+  const logs=await getAll('logs'); logs.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('fulllog-tbody').innerHTML=logs.length?logs.map(l=>`<tr>
+    <td>${new Date(l.date).toLocaleDateString('en-NP')}</td>
+    <td><span class="badge ${l.type==='income'?'bg':'br'}">${l.type}</span></td>
+    <td>${l.desc}</td>
+    <td style="font-weight:500;color:${l.type==='income'?'#81c784':'#e57373'}">Rs. ${Number(l.amount).toLocaleString()}</td>
+    <td><button class="btn btn-d btn-sm" onclick="delLog('${l._id}')">Delete</button></td>
+  </tr>`).join(''):'<tr><td colspan="5" class="empty">No entries yet</td></tr>';
+}
+window.delLog = async id => { await del('logs',id); loadFullLog(); loadAnalytics(); toast('✦ Entry deleted.'); };
+window.exportCSV = async () => {
+  const logs=await getAll('logs'); if(!logs.length){toast('No data.','error');return;}
+  dl(['Date,Type,Description,Amount',...logs.map(l=>[l.date,l.type,l.desc,l.amount].map(v=>`"${v||''}"`).join(','))].join('\n'),'detoxclub-log.csv','text/csv');
+  toast('✦ CSV exported.');
+};
+window.exportPDF = async () => {
+  const logs=await getAll('logs');
+  const inc=logs.filter(l=>l.type==='income').reduce((s,l)=>s+Number(l.amount),0);
+  const exp=logs.filter(l=>l.type==='expense').reduce((s,l)=>s+Number(l.amount),0);
+  const html=`<html><head><title>Detox Club Report</title><style>body{font-family:Georgia,serif;padding:40px;color:#2c2c1e;}table{width:100%;border-collapse:collapse;margin-top:20px;}th{text-align:left;padding:8px;background:#f5f0e4;font-size:12px;}td{padding:8px;border-bottom:1px solid #ede6d3;font-size:13px;}.s{display:flex;gap:20px;margin:20px 0;}.b{background:#f5f0e4;padding:16px 20px;border-radius:10px;text-align:center;}.l{font-size:11px;text-transform:uppercase;color:#8a8470;}.v{font-size:24px;margin-top:4px;}</style></head>
+  <body><h1>The Detox Club — Financial Report</h1><p>Generated ${new Date().toLocaleDateString()}</p>
+  <div class="s"><div class="b"><div class="l">Income</div><div class="v">Rs. ${inc.toLocaleString()}</div></div><div class="b"><div class="l">Expenses</div><div class="v">Rs. ${exp.toLocaleString()}</div></div><div class="b"><div class="l">Net Profit</div><div class="v">Rs. ${(inc-exp).toLocaleString()}</div></div></div>
+  <table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Amount</th></tr></thead><tbody>${logs.map(l=>`<tr><td>${l.date}</td><td>${l.type}</td><td>${l.desc}</td><td>Rs. ${Number(l.amount).toLocaleString()}</td></tr>`).join('')}</tbody></table></body></html>`;
+  const w=window.open('','_blank');w.document.write(html);w.document.close();w.print();
+};
+
+// ── COMMUNITY ──
+async function loadCommunity() {
+  const msgs=await getAll('community'); msgs.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  document.getElementById('community-tbody').innerHTML=msgs.length?msgs.map(m=>`<tr>
+    <td style="font-weight:500;">${m.name}</td>
+    <td style="font-style:italic;color:rgba(245,240,228,0.75);">"${m.message}"</td>
+    <td>${m.createdAt?.seconds?new Date(m.createdAt.seconds*1000).toLocaleDateString('en-NP'):'—'}</td>
+    <td><button class="btn btn-d btn-sm" onclick="delMsg('${m._id}')">Delete</button></td>
+  </tr>`).join(''):'<tr><td colspan="4" class="empty">No messages yet</td></tr>';
+}
+window.delMsg = async id => { await del('community',id); loadCommunity(); toast('✦ Message removed from Firebase.'); };
+
+// ── GALLERY ──
+let galImg='';
+window.handleGalFile = input => { if(!input.files[0])return; const r=new FileReader(); r.onload=e=>{galImg=e.target.result;}; r.readAsDataURL(input.files[0]); };
+window.addGalItem = async () => {
+  const url=document.getElementById('gal-url').value.trim(), cap=document.getElementById('gal-cap').value.trim(), final=galImg||url;
+  if(!final){toast('Upload or paste a URL.','error');return;}
+  await add('gallery',{url:final,caption:cap});
+  document.getElementById('gal-url').value=''; document.getElementById('gal-cap').value=''; galImg='';
+  loadGallery(); toast('✦ Photo added to Firebase!');
+};
+async function loadGallery() {
+  const g=await getAll('gallery');
+  document.getElementById('gal-grid').innerHTML=g.length?g.map(p=>`<div class="gal-item"><img src="${p.url}" alt="${p.caption||''}"/><button class="gal-del" onclick="delGal('${p._id}')">×</button></div>`).join(''):'<p style="color:var(--muted);font-style:italic;font-size:13px;grid-column:1/-1;">No photos yet.</p>';
+}
+window.delGal = async id => { await del('gallery',id); loadGallery(); toast('✦ Photo removed from Firebase.'); };
+
+// ── SETTINGS ──
+async function loadSettings() {
+  const s=await getOne('settings','main')||{};
+  document.getElementById('set-open').value=s.openTime||'10:00';
+  document.getElementById('set-close').value=s.closeTime||'20:00';
+  document.getElementById('set-ann').value=s.announcement||'✦ Welcome to The Detox Club — Walkhu Galli, Lalitpur ✦ Open Daily 10:00 AM – 8:00 PM ✦ 5% off combo meals ✦ Follow & tag us on Instagram for 5% off ✦';
+  const p=s.promos||['5% off combo meals — 1 drink + 1 food item','Follow & tag us on Instagram for 5% off'];
+  document.getElementById('set-p1').value=p[0]||''; document.getElementById('set-p2').value=p[1]||'';
+}
+window.saveSettings = async () => {
+  const s={openTime:document.getElementById('set-open').value,closeTime:document.getElementById('set-close').value,announcement:document.getElementById('set-ann').value,promos:[document.getElementById('set-p1').value,document.getElementById('set-p2').value].filter(Boolean)};
+  await save('settings','main',s);
+  toast('✦ Settings saved to Firebase — live on all devices!');
+};
+
+document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('en-NP',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+</script>
+</body>
+</html>

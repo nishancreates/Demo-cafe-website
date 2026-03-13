@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Detox Club — Café · Collaboration · Calm</title>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+/* ── HOME-SPECIFIC STYLES ── */
+body { background: var(--cream); }
+
+/* WELCOME SPLASH */
+#welcome-splash {
+  position: fixed;
+  inset: 0;
+  background: var(--cream);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+#welcome-splash .splash-logo {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(0.7);
+  animation: splashLogo 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s forwards;
+}
+#welcome-splash .splash-name {
+  font-family: var(--font-serif);
+  font-size: 38px;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  color: var(--charcoal);
+  opacity: 0;
+  animation: splashFade 0.7s ease 1.1s forwards;
+}
+#welcome-splash .splash-tagline {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0;
+  animation: splashFade 0.7s ease 1.5s forwards;
+}
+#welcome-splash .splash-line {
+  width: 0;
+  height: 1px;
+  background: var(--tan);
+  animation: splashLine 0.8s ease 1.9s forwards;
+}
+@keyframes splashLogo { to { opacity: 1; transform: scale(1); } }
+@keyframes splashFade { to { opacity: 1; } }
+@keyframes splashLine { to { width: 120px; } }
+#welcome-splash.hide {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease 2.5s;
+}
+
+/* HERO */
+.hero {
+  min-height: 92vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: var(--cream);
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 70% 40%, rgba(122,140,94,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 20% 80%, rgba(196,168,130,0.15) 0%, transparent 55%);
+  z-index: 0;
+}
+/* Botanical SVG pattern */
+.hero-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%232c2c1e' fill-rule='evenodd'%3E%3Ccircle cx='40' cy='40' r='2'/%3E%3Cpath d='M40 10 Q45 20 40 30 Q35 20 40 10Z'/%3E%3Cpath d='M10 40 Q20 35 30 40 Q20 45 10 40Z'/%3E%3Cpath d='M50 40 Q60 35 70 40 Q60 45 50 40Z'/%3E%3Cpath d='M40 50 Q45 60 40 70 Q35 60 40 50Z'/%3E%3C/g%3E%3C/svg%3E");
+  z-index: 0;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 60px 40px;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 60px;
+  align-items: center;
+  width: 100%;
+}
+.hero-left {}
+.hero-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: heroUp 0.7s ease 2.8s forwards;
+}
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(44px, 6vw, 76px);
+  font-weight: 300;
+  line-height: 1.08;
+  color: var(--charcoal);
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: heroUp 0.8s ease 3.0s forwards;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--sage);
+}
+/* Rotating quotes */
+#hero-quote {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 36px;
+  min-height: 52px;
+  opacity: 0;
+  animation: heroUp 0.8s ease 3.2s forwards;
+  transition: opacity 0.5s ease;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  opacity: 0;
+  animation: heroUp 0.8s ease 3.4s forwards;
+}
+@keyframes heroUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero-actions a { transform: translateY(10px); }
+
+/* Hero right card */
+.hero-card {
+  background: rgba(255,253,244,0.85);
+  border: 1px solid rgba(196,168,130,0.3);
+  border-radius: 20px;
+  padding: 32px;
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  animation: heroUp 0.9s ease 3.5s forwards;
+}
+.hero-card-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(196,168,130,0.2);
+}
+.hero-card-top img {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.hero-card-top-text h3 {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 500;
+}
+.hero-card-top-text p {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.hero-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4caf50;
+  animation: pulse 2s ease infinite;
+}
+.status-dot.closed { background: #e57373; animation: none; }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(76,175,80,0); }
+}
+.status-text { font-size: 13px; color: var(--charcoal); }
+.hero-hours {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--charcoal);
+  margin-bottom: 6px;
+}
+.hero-hours-label {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.hero-quick-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hero-quick-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--cream-dark);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--charcoal);
+  font-size: 13px;
+  transition: var(--transition);
+}
+.hero-quick-link:hover {
+  background: var(--sage);
+  color: var(--white);
+  transform: translateX(4px);
+}
+.hero-quick-link span { font-size: 16px; }
+
+/* FEATURED MENU */
+.section-featured {
+  padding: 90px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+.featured-card {
+  background: var(--white);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+.featured-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+.featured-card-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.featured-card:hover .featured-card-img { transform: scale(1.05); }
+.featured-card-body { padding: 18px 20px; }
+.featured-card-cat {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 6px;
+}
+.featured-card-name {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.featured-card-desc {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+.featured-card-price {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--terracotta);
+}
+
+/* EVENTS PREVIEW */
+.section-events {
+  background: var(--charcoal);
+  padding: 90px 40px;
+}
+.section-events-inner { max-width: 1100px; margin: 0 auto; }
+.section-events .section-title { color: var(--cream); }
+.section-events .section-subtitle { color: var(--tan); }
+.section-events .section-divider { background: var(--tan); }
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+.event-card {
+  background: rgba(255,253,244,0.06);
+  border: 1px solid rgba(196,168,130,0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: var(--transition);
+}
+.event-card:hover {
+  background: rgba(255,253,244,0.1);
+  transform: translateY(-4px);
+  border-color: rgba(196,168,130,0.4);
+}
+.event-card-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  opacity: 0.85;
+}
+.event-card-body { padding: 20px; }
+.event-date {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--tan);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.event-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--cream);
+  margin-bottom: 8px;
+}
+.event-desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+.event-rsvp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--tan-light);
+  text-decoration: none;
+  border: 1px solid rgba(196,168,130,0.3);
+  padding: 6px 16px;
+  border-radius: 20px;
+  transition: var(--transition);
+}
+.event-rsvp:hover { background: var(--tan); color: var(--charcoal); }
+.no-events {
+  grid-column: 1/-1;
+  text-align: center;
+  color: var(--muted);
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-style: italic;
+  padding: 40px;
+}
+
+/* GALLERY */
+.section-gallery {
+  padding: 90px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 40px;
+}
+.gallery-item {
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: var(--cream-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.gallery-item:hover img { transform: scale(1.06); }
+.gallery-placeholder {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+  text-align: center;
+  padding: 16px;
+}
+
+/* COMMUNITY WALL */
+.section-community {
+  background: #eee8d5;
+  padding: 80px 40px;
+}
+.section-community-inner { max-width: 1100px; margin: 0 auto; }
+.community-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 40px;
+}
+.community-card {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+.community-card-msg {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--charcoal);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+.community-card-author { font-size: 12px; color: var(--muted); }
+.community-form {
+  margin-top: 40px;
+  display: flex;
+  gap: 12px;
+  max-width: 600px;
+}
+.community-form input {
+  flex: 1;
+  padding: 12px 20px;
+  border: 1.5px solid var(--tan-light);
+  border-radius: 30px;
+  background: var(--white);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--charcoal);
+  outline: none;
+  transition: var(--transition);
+}
+.community-form input:focus { border-color: var(--sage); }
+
+/* NEWSLETTER */
+.section-newsletter {
+  padding: 80px 40px;
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+.newsletter-form {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.newsletter-form input {
+  flex: 1;
+  padding: 13px 22px;
+  border: 1.5px solid var(--tan-light);
+  border-radius: 30px;
+  background: var(--white);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  outline: none;
+  transition: var(--transition);
+}
+.newsletter-form input:focus { border-color: var(--sage); }
+
+/* INSTAGRAM SECTION */
+.section-instagram {
+  background: var(--sage);
+  padding: 60px 40px;
+  text-align: center;
+}
+.section-instagram h2 {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+.section-instagram p { color: rgba(255,255,255,0.75); font-size: 14px; margin-bottom: 24px; }
+.section-instagram a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  color: var(--sage-dark);
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 14px;
+  transition: var(--transition);
+}
+.section-instagram a:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+/* OWNER GATEWAY */
+.owner-gateway {
+  background: var(--charcoal);
+  padding: 40px;
+  text-align: center;
+}
+.owner-gateway p {
+  font-size: 12px;
+  color: rgba(255,255,255,0.12);
+  letter-spacing: 0.06em;
+}
+.owner-gateway a {
+  color: rgba(255,255,255,0.12);
+  text-decoration: none;
+  font-size: 12px;
+  transition: color 0.3s;
+}
+.owner-gateway a:hover { color: rgba(255,255,255,0.5); }
+
+/* PROMO BANNERS */
+.promo-banners {
+  display: flex;
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px 60px;
+  flex-wrap: wrap;
+}
+.promo-banner {
+  flex: 1;
+  min-width: 280px;
+  background: var(--charcoal);
+  color: var(--cream);
+  border-radius: 16px;
+  padding: 28px 32px;
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.4;
+  position: relative;
+  overflow: hidden;
+}
+.promo-banner::before {
+  content: '✦';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 60px;
+  opacity: 0.08;
+  color: var(--tan);
+}
+.promo-banner em { color: var(--tan-light); font-style: normal; }
+
+@media (max-width: 768px) {
+  .hero-content { grid-template-columns: 1fr; padding: 40px 20px; }
+  .hero-card { display: none; }
+  .featured-grid { grid-template-columns: 1fr 1fr; }
+  .events-grid { grid-template-columns: 1fr; }
+  .community-grid { grid-template-columns: 1fr; }
+  .gallery-grid { grid-template-columns: repeat(2,1fr); }
+  .section-featured, .section-gallery { padding: 60px 20px; }
+  .section-events { padding: 60px 20px; }
+  .section-community { padding: 60px 20px; }
+  .promo-banners { padding: 0 20px 40px; }
+  .newsletter-form { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- WELCOME SPLASH -->
+<div id="welcome-splash">
+  <img src="images/logo.webp" alt="The Detox Club" class="splash-logo"/>
+  <div class="splash-name">THE DETOX CLUB</div>
+  <div class="splash-tagline">Café · Collaboration · Calm</div>
+  <div class="splash-line"></div>
+</div>
+
+<!-- ANNOUNCEMENT BAR -->
+<div id="announcement-bar">
+  <div class="marquee-track" id="marquee-track">
+    <span id="ann-text-1">✦ Welcome to The Detox Club — Walkhu Galli, Lalitpur ✦ Open Daily 10:00 AM – 8:00 PM ✦ 5% off combo meals: 1 drink + 1 food item ✦ Follow &amp; tag us on Instagram for 5% off ✦</span>
+    <span id="ann-text-2">✦ Welcome to The Detox Club — Walkhu Galli, Lalitpur ✦ Open Daily 10:00 AM – 8:00 PM ✦ 5% off combo meals: 1 drink + 1 food item ✦ Follow &amp; tag us on Instagram for 5% off ✦</span>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo.webp" alt="Logo"/>
+    <div class="nav-logo-text">The Detox Club<span>Café · Collaboration · Calm</span></div>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="menu.html">Menu</a></li>
+    <li><a href="events.html">Events</a></li>
+    <li><a href="story.html">Our Story</a></li>
+    <li><a href="visit.html">Visit Us</a></li>
+    <li><a href="visit.html#reserve" class="nav-cta">Reserve a Seat</a></li>
+  </ul>
+  <div class="nav-hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-pattern"></div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Walkhu Galli, Lalitpur, Nepal</div>
+      <h1 class="hero-title">A place to<br/><em>sip, stay,</em><br/>& belong.</h1>
+      <p id="hero-quote">"Every cup tells a story of care."</p>
+      <div class="hero-actions">
+        <a href="menu.html" class="btn btn-primary">View Menu</a>
+        <a href="visit.html#reserve" class="btn btn-secondary">Reserve a Seat</a>
+        <a href="visit.html" class="btn btn-dark">Find Us</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-top">
+        <img src="images/logo.webp" alt="Logo"/>
+        <div class="hero-card-top-text">
+          <h3>The Detox Club</h3>
+          <p>Est. 2026 · Lalitpur</p>
+        </div>
+      </div>
+      <div class="hero-status">
+        <div class="status-dot" id="status-dot"></div>
+        <span class="status-text" id="status-text">Checking hours…</span>
+      </div>
+      <div class="hero-hours" id="hero-hours">10:00 AM – 8:00 PM</div>
+      <div class="hero-hours-label">Daily Opening Hours</div>
+      <div class="hero-quick-links">
+        <a href="menu.html" class="hero-quick-link"><span>🍵</span> Browse Menu <span>→</span></a>
+        <a href="events.html" class="hero-quick-link"><span>🌿</span> Upcoming Events <span>→</span></a>
+        <a href="visit.html#reserve" class="hero-quick-link"><span>📋</span> Make a Reservation <span>→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROMO BANNERS -->
+<div class="promo-banners" id="promo-banners">
+  <div class="promo-banner"><em>5% off</em> combo meals<br/>1 drink + 1 food item</div>
+  <div class="promo-banner">Follow &amp; tag us on Instagram<br/>for <em>5% off</em> your order</div>
+</div>
+
+<!-- FEATURED MENU -->
+<section class="section-featured reveal">
+  <span class="section-subtitle">Today's Favourites</span>
+  <h2 class="section-title">What's on<br/>everyone's table</h2>
+  <div class="section-divider"></div>
+  <div class="featured-grid" id="featured-grid">
+    <!-- Loaded from Firebase/localStorage -->
+  </div>
+</section>
+
+<!-- EVENTS PREVIEW -->
+<section class="section-events reveal">
+  <div class="section-events-inner">
+    <span class="section-subtitle">At The Club</span>
+    <h2 class="section-title">Upcoming Events</h2>
+    <div class="section-divider"></div>
+    <div class="events-grid" id="events-grid">
+      <!-- Loaded from Firebase/localStorage -->
+    </div>
+    <div style="margin-top:36px;">
+      <a href="events.html" class="btn btn-secondary" style="color:var(--tan-light);border-color:rgba(196,168,130,0.4);">See All Events →</a>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="section-gallery reveal">
+  <span class="section-subtitle">The Space</span>
+  <h2 class="section-title">Our Gallery</h2>
+  <div class="section-divider"></div>
+  <div class="gallery-grid" id="gallery-grid">
+    <!-- Loaded from dashboard -->
+  </div>
+</section>
+
+<!-- COMMUNITY WALL -->
+<section class="section-community reveal">
+  <div class="section-community-inner">
+    <span class="section-subtitle">From Our Guests</span>
+    <h2 class="section-title">The Community Wall</h2>
+    <div class="section-divider"></div>
+    <div class="community-grid" id="community-grid">
+      <!-- Loaded from Firebase -->
+    </div>
+    <form class="community-form" id="community-form" onsubmit="submitMessage(event)">
+      <input type="text" id="msg-name" placeholder="Your name" required/>
+      <input type="text" id="msg-text" placeholder="Leave a kind word…" required style="flex:2"/>
+      <button type="submit" class="btn btn-primary">Share</button>
+    </form>
+  </div>
+</section>
+
+<!-- INSTAGRAM -->
+<section class="section-instagram reveal">
+  <h2>Find us on Instagram</h2>
+  <p>Share your moment. Tag us. Be part of the story.</p>
+  <a href="https://instagram.com/the.detoxclub" target="_blank">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+    @the.detoxclub
+  </a>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="section-newsletter reveal">
+  <span class="section-subtitle">Stay Connected</span>
+  <h2 class="section-title">Join the circle</h2>
+  <p style="color:var(--muted);margin-top:12px;font-size:14px;">Gentle updates on events, new items, and quiet moments.</p>
+  <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+    <input type="email" placeholder="your@email.com" required/>
+    <button type="submit" class="btn btn-primary">Subscribe</button>
+  </form>
+</section>
+
+<!-- OWNER GATEWAY (hidden at bottom) -->
+<div class="owner-gateway">
+  <p>© 2026 The Detox Club · Walkhu Galli, Lalitpur · <a href="dashboard.html">⚙</a></p>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <img src="images/logo.webp" alt="Logo"/>
+      <h3>The Detox Club</h3>
+      <p>A sanctuary for the senses.<br/>Café · Collaboration · Calm<br/>Est. 2026, Lalitpur</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="menu.html">Menu</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="story.html">Our Story</a></li>
+        <li><a href="visit.html">Visit Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Visit</h4>
+      <p>Walkhu Galli<br/>Lalitpur 44600<br/>Nepal<br/><br/>Open Daily<br/>10:00 AM – 8:00 PM</p>
+    </div>
+    <div class="footer-col">
+      <h4>Connect</h4>
+      <ul>
+        <li><a href="https://wa.me/9779849197952">WhatsApp</a></li>
+        <li><a href="https://instagram.com/the.detoxclub">Instagram</a></li>
+        <li><a href="mailto:hello@thedetoxclub.com">Email</a></li>
+        <li><a href="https://maps.app.goo.gl/wprFuSWDPj17qSJ59" target="_blank">Google Maps</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 The Detox Club. All rights reserved.</span>
+    <span>Made with 🌿 in Lalitpur</span>
+  </div>
+</footer>
+
+<!-- FLOATING BUTTONS -->
+<div class="floating-buttons">
+  <a href="https://wa.me/9779849197952" class="float-btn float-btn-wa" target="_blank">
+    <span class="float-btn-label">WhatsApp us</span>
+    <svg viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+  <a href="https://instagram.com/the.detoxclub" class="float-btn float-btn-ig" target="_blank">
+    <span class="float-btn-label">Follow us</span>
+    <svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+  </a>
+  <a href="mailto:hello@thedetoxclub.com" class="float-btn float-btn-email">
+    <span class="float-btn-label">Email us</span>
+    <svg viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+  </a>
+</div>
+
+<!-- DASHBOARD SUBTLE ICON -->
+<a href="dashboard.html" class="dashboard-subtle" title="Owner Access">
+  <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+</a>
+
+<!-- FIREBASE + APP LOGIC -->
+<!-- Firebase Compat (works by double-clicking, no server needed) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+const _FC = {
+  apiKey:"AIzaSyDY2pN3MaabGoB8C30alX9r5azTjo0OQj8",
+  authDomain:"detoxclub-dashboard.firebaseapp.com",
+  projectId:"detoxclub-dashboard",
+  storageBucket:"detoxclub-dashboard.firebasestorage.app",
+  messagingSenderId:"443733326967",
+  appId:"1:443733326967:web:70fc6de77f8fac04aa5a72"
+};
+let _db = null;
+try { firebase.initializeApp(_FC); _db = firebase.firestore(); console.log("✦ Firebase connected"); } catch(e) { console.log("Firebase offline — using local fallback"); }
+
+function lsGet(k,f=null){try{const v=localStorage.getItem('dtx_'+k);return v?JSON.parse(v):f;}catch{return f;}}
+function lsSet(k,v){try{localStorage.setItem('dtx_'+k,JSON.stringify(v));}catch{}}
+
+const DB = {
+  async getAll(col) {
+    if(_db){try{const s=await _db.collection(col).get();const d=s.docs.map(x=>({_id:x.id,...x.data()}));lsSet(col,d);return d;}catch(e){}}
+    return lsGet(col,[]);
+  },
+  async getOne(col,id) {
+    if(_db){try{const s=await _db.collection(col).doc(id).get();return s.exists?{_id:s.id,...s.data()}:null;}catch(e){}}
+    return lsGet(col+'_'+id,null);
+  },
+  async add(col,data) {
+    const clean=JSON.parse(JSON.stringify(data));
+    if(_db){try{const r=await _db.collection(col).add({...clean,createdAt:firebase.firestore.FieldValue.serverTimestamp()});return r.id;}catch(e){}}
+    const arr=lsGet(col,[]);const id=Date.now().toString();arr.push({_id:id,...clean});lsSet(col,arr);return id;
+  }
+};
+</script>
+<script>
+// ── SPLASH ──
+const splash = document.getElementById('welcome-splash');
+const shown = sessionStorage.getItem('splashShown');
+if (shown) {
+  splash.style.display = 'none';
+} else {
+  sessionStorage.setItem('splashShown', '1');
+  setTimeout(() => { splash.classList.add('hide'); setTimeout(() => splash.style.display = 'none', 700); }, 2600);
+}
+
+// ── NAVBAR ──
+window.addEventListener('scroll', () => { document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60); });
+document.getElementById('hamburger').addEventListener('click', () => { document.getElementById('nav-links').classList.toggle('open'); });
+
+// ── HERO QUOTES ──
+const quotes = [
+  '"Every cup tells a story of care."',
+  '"Slow down. This is where you belong."',
+  '"Nourish the body. Restore the soul."',
+  '"Good things brew here."',
+  '"A sip of calm in a busy world."',
+  '"Detox your day. One cup at a time."'
+];
+let qi = 0;
+const qEl = document.getElementById('hero-quote');
+function rotateQuote() {
+  qEl.style.opacity = '0';
+  setTimeout(() => { qi=(qi+1)%quotes.length; qEl.textContent=quotes[qi]; qEl.style.opacity='1'; }, 500);
+}
+setInterval(rotateQuote, 4000);
+
+// ── CAFÉ STATUS ──
+async function updateStatus() {
+  let openTime = '10:00', closeTime = '20:00';
+  try { const s = await DB.getOne('settings','main'); if(s){openTime=s.openTime||openTime; closeTime=s.closeTime||closeTime;} } catch(e){}
+  const now = new Date();
+  const [oh,om]=openTime.split(':').map(Number), [ch,cm]=closeTime.split(':').map(Number);
+  const nowMins=now.getHours()*60+now.getMinutes();
+  const isOpen=nowMins>=(oh*60+om)&&nowMins<(ch*60+cm);
+  const dot=document.getElementById('status-dot'), txt=document.getElementById('status-text'), hrs=document.getElementById('hero-hours');
+  if(dot) dot.className='status-dot'+(isOpen?'':' closed');
+  if(txt) txt.textContent=isOpen?'Open Now · Come in!':'Currently Closed';
+  const fmt=t=>{const[h,m]=t.split(':');const hr=parseInt(h);return`${hr>12?hr-12:hr||12}:${m} ${hr>=12?'PM':'AM'}`;};
+  if(hrs) hrs.textContent=`${fmt(openTime)} – ${fmt(closeTime)}`;
+}
+updateStatus();
+
+// ── ANNOUNCEMENT ──
+async function loadAnnouncement() {
+  let ann = '✦ Welcome to The Detox Club — Walkhu Galli, Lalitpur ✦ Open Daily 10:00 AM – 8:00 PM ✦ 5% off combo meals: 1 drink + 1 food ✦ Follow & tag us on Instagram for 5% off ✦';
+  try { const s=await DB.getOne('settings','main'); if(s?.announcement) ann=s.announcement; } catch(e){}
+  ['ann-text-1','ann-text-2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ann;});
+}
+loadAnnouncement();
+
+// ── PROMO BANNERS ──
+async function loadPromos() {
+  const container = document.getElementById('promo-banners');
+  if(!container) return;
+  let promos = ['5% off combo meals — 1 drink + 1 food item','Follow & tag us on Instagram for 5% off your order'];
+  try { const s=await DB.getOne('settings','main'); if(s?.promos?.length) promos=s.promos; } catch(e){}
+  container.innerHTML = promos.map(p=>`<div class="promo-banner">${p}</div>`).join('');
+}
+loadPromos();
+
+// ── FEATURED ITEMS ──
+const ALL_MENU = [
+  {id:'mint-black',name:'Mint Black Tea',cat:'Core Brews',price:'Rs. 50',desc:'Clarity in every sip. Cool mint meets bold black tea.',img:'images/mint-black.jpg'},
+  {id:'masala-tea',name:'Masala Tea',cat:'Core Brews',price:'Rs. 60',desc:'A symphony of spices. Warmth brewed to perfection.',img:'images/masala-tea.jpg'},
+  {id:'coffee',name:'Traditional Coffee',cat:'Core Brews',price:'Rs. 100 / 150',desc:'The anchor. Rich, grounding, honest.',img:'images/coffee.jpg'},
+  {id:'english-tea',name:'English Breakfast Tea',cat:'Core Brews',price:'Rs. 150',desc:'The classic. A cup that never lets you down.',img:'images/english-tea.jpg'},
+  {id:'kaadaa',name:'Kaa-daa',cat:'Warm Detox',price:'Rs. 150',desc:'Sacred spice. The rejuvenation blend.',img:'images/kaadaa.jpg'},
+  {id:'golden-milk',name:'Golden Mountain Milk',cat:'Warm Detox',price:'Rs. 150',desc:'The healing light. Turmeric warmth in a glass.',img:'images/golden-milk.jpg'},
+  {id:'lemon-ginger',name:'Hot Lemon Ginger Honey',cat:'Warm Detox',price:'Rs. 150',desc:'Simplicity. Bright, alive, and cleansing.',img:'images/lemon-ginger.jpg'},
+  {id:'apple-spice',name:'Apple Spice Brew',cat:'Warm Detox',price:'Rs. 150',desc:'Nostalgia in a cup. Autumn warmth, always.',img:'images/apple-spice.jpg'},
+  {id:'bel-elixir',name:'Bel Elixir',cat:'Cold Detox',price:'Rs. 300',desc:'Patience rewarded. A cooling, ancient remedy.',img:'images/bel-elixir.jpg'},
+  {id:'chlorophyll-juice',name:'Chlorophyll Green Juice',cat:'Cold Detox',price:'Rs. 300',desc:'Liquid sunlight. Pure, alive, and green.',img:'images/chlorophyll-juice.jpg'},
+  {id:'abc-vitality',name:'ABC Vitality',cat:'Cold Detox',price:'Rs. 300',desc:"Apple, Beet, Carrot. Nature's power trio.",img:'images/abc-vitality.jpg'},
+  {id:'matcha',name:'Matcha',cat:'Cold Detox',price:'Rs. 350',desc:"The monk's focus. Ceremonial grade, lovingly prepared.",img:'images/matcha.webp'},
+  {id:'detox-breakfast',name:'Detox Breakfast',cat:'Breakfast',price:'Rs. 400 + 120',desc:'The all-morning plate. Eggs, mushrooms, veggies, fruits.',img:'images/detox-breakfast.jpg'},
+  {id:'detox-fruity-pancake',name:'Detox Fruity Pancakes',cat:'Breakfast',price:'Rs. 250 + 100',desc:'Gentle indulgence. Pancakes with maple, cream, fruits.',img:'images/detox-fruity-pancake.jpg'},
+  {id:'detox-meal',name:'Detox Meal',cat:'Detox Lunch',price:'Rs. 350 + 120',desc:'Grounded nourishment. Rice, mushrooms, spinach, sesame.',img:'images/detox-meal.jpg'},
+  {id:'detox-bake',name:'Detox Bake',cat:'Detox Lunch',price:'Rs. 250 + 120',desc:'Earth & oven. Baked sweet potato with veggies.',img:'images/detox-bake.jpg'},
+  {id:'detox-mash',name:'Detox Mash',cat:'Detox Lunch',price:'Rs. 350',desc:'The soften. Mashed potatoes, cauli, sauté veggies.',img:'images/detox-mash.jpg'},
+  {id:'lunch-bowl',name:'Detox Lunch Bowl',cat:'Detox Lunch',price:'Rs. 350',desc:'Rice, chicken, mushroom, potato, spinach & sesame.',img:'images/lunch-bowl.jpg'},
+  {id:'orange-magic',name:'Orange Magic',cat:'Sweet Tooth',price:'Rs. 150',desc:'Sunshine on a plate. Zest and sweetness.',img:'images/orange-magic.jpg'},
+  {id:'strawberry-angels',name:'Strawberry Angels',cat:'Sweet Tooth',price:'Rs. 150',desc:'Light as clouds. Strawberries, cream, joy.',img:'images/strawberry-angels.jpg'},
+  {id:'apple-melts',name:'Apple Melts',cat:'Sweet Tooth',price:'Rs. 150',desc:'Warm apple caramel in a cup. Pure comfort.',img:'images/apple-melts.jpg'},
+];
+
+async function loadFeatured() {
+  let featured = ['matcha','detox-breakfast','strawberry-angels'];
+  try { const s=await DB.getOne('settings','main'); if(s?.featuredIds?.length) featured=s.featuredIds; } catch(e){}
+  let menuItems = ALL_MENU;
+  try { const m=await DB.getAll('menu'); if(m?.length) menuItems=m; } catch(e){}
+  const items = featured.map(id=>menuItems.find(m=>(m._id||m.id)===id)).filter(Boolean);
+  const grid = document.getElementById('featured-grid');
+  if(!grid) return;
+  if(!items.length){grid.innerHTML='<p style="color:var(--muted);font-style:italic;grid-column:1/-1;text-align:center;padding:40px;">Visit the dashboard to select featured items.</p>';return;}
+  grid.innerHTML = items.map(item=>`<a href="menu.html" class="featured-card reveal"><img src="${item.img}" alt="${item.name}" class="featured-card-img" onerror="this.style.background='#e8e0cc'"/><div class="featured-card-body"><div class="featured-card-cat">${item.cat}</div><div class="featured-card-name">${item.name}</div><div class="featured-card-desc">${item.desc||''}</div><div class="featured-card-price">${item.price}</div></div></a>`).join('');
+  initReveal();
+}
+loadFeatured();
+
+// ── EVENTS ──
+async function loadEvents() {
+  const grid=document.getElementById('events-grid'); if(!grid)return;
+  let events=[];
+  try{events=await DB.getAll('events');}catch(e){}
+  const upcoming=events.filter(e=>!e.isPast).slice(0,3);
+  if(!upcoming.length){grid.innerHTML='<div class="no-events">✦ No upcoming events — check back soon.</div>';return;}
+  grid.innerHTML=upcoming.map(ev=>`<div class="event-card reveal">${ev.image?`<img src="${ev.image}" alt="${ev.title}" class="event-card-img"/>`:'<div class="event-card-img" style="background:var(--sage);opacity:0.3;"></div>'}<div class="event-card-body"><div class="event-date">${ev.date||''} ${ev.time?'· '+ev.time:''}</div><div class="event-title">${ev.title}</div><div class="event-desc">${(ev.description||'').slice(0,80)}…</div><a href="events.html" class="event-rsvp">RSVP →</a></div></div>`).join('');
+  initReveal();
+}
+loadEvents();
+
+// ── GALLERY ──
+async function loadGallery() {
+  const grid=document.getElementById('gallery-grid'); if(!grid)return;
+  let gallery=[];
+  try{gallery=await DB.getAll('gallery');}catch(e){}
+  if(!gallery.length){grid.innerHTML=Array(8).fill('<div class="gallery-item"><div class="gallery-placeholder">🌿</div></div>').join('');return;}
+  grid.innerHTML=gallery.slice(0,8).map(g=>`<div class="gallery-item"><img src="${g.url}" alt="${g.caption||''}" loading="lazy"/></div>`).join('');
+}
+loadGallery();
+
+// ── COMMUNITY WALL ──
+async function loadCommunity() {
+  const grid=document.getElementById('community-grid'); if(!grid)return;
+  let messages=[];
+  try{messages=await DB.getAll('community');}catch(e){}
+  const defaults=[{name:'Priya S.',message:'The matcha here changed my mornings forever. Pure peace in a glass.'},{name:'Aarav M.',message:'Best detox breakfast in Lalitpur, hands down. Come here every Sunday.'},{name:'Sita R.',message:'The space feels like a hug. I bring my journal and just exist here.'}];
+  const display=messages.length?messages:defaults;
+  grid.innerHTML=display.slice(0,6).map(m=>`<div class="community-card reveal"><div class="community-card-msg">"${m.message}"</div><div class="community-card-author">— ${m.name}</div></div>`).join('');
+  initReveal();
+}
+loadCommunity();
+
+// ── SUBMIT COMMUNITY MESSAGE ──
+window.submitMessage = async function(e) {
+  e.preventDefault();
+  const name=document.getElementById('msg-name').value.trim(), message=document.getElementById('msg-text').value.trim();
+  if(!name||!message)return;
+  await DB.add('community',{name,message,createdAt:new Date().toISOString()});
+  document.getElementById('msg-name').value=''; document.getElementById('msg-text').value='';
+  loadCommunity();
+  showToast('✦ Your message has been shared!');
+};
+
+// ── NEWSLETTER ──
+window.subscribeNewsletter = async function(e) {
+  e.preventDefault();
+  const email=e.target.querySelector('input').value;
+  await DB.add('newsletter',{email,createdAt:new Date().toISOString()});
+  e.target.querySelector('input').value='';
+  showToast('✦ Welcome to the circle!');
+};
+
+// ── TOAST ──
+function showToast(msg) {
+  const t=document.createElement('div'); t.textContent=msg;
+  Object.assign(t.style,{position:'fixed',bottom:'80px',left:'50%',transform:'translateX(-50%) translateY(20px)',background:'var(--charcoal)',color:'var(--cream)',padding:'12px 28px',borderRadius:'30px',fontSize:'13px',zIndex:'9999',opacity:'0',transition:'all 0.4s ease',fontFamily:'var(--font-sans)'});
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>{t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';});
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),400);},3000);
+}
+window.showToast=showToast;
+
+// ── SCROLL REVEAL ──
+function initReveal() {
+  const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+initReveal();
+</script>
+</body>
+</html>

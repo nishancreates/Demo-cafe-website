@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Menu — The Detox Club</title>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+body { background: #f0ebe0; }
+
+.menu-hero {
+  background: var(--charcoal);
+  padding: 80px 40px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.menu-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f5f0e4' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Cpath d='M30 5 Q35 15 30 25 Q25 15 30 5Z'/%3E%3Cpath d='M5 30 Q15 25 25 30 Q15 35 5 30Z'/%3E%3C/g%3E%3C/svg%3E");
+}
+.menu-hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(40px, 7vw, 72px);
+  font-weight: 300;
+  color: var(--cream);
+  margin-bottom: 14px;
+  position: relative;
+}
+.menu-hero p {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-style: italic;
+  color: var(--muted);
+  position: relative;
+}
+
+/* FILTERS */
+.menu-filters {
+  position: sticky;
+  top: 70px;
+  z-index: 50;
+  background: rgba(240,235,224,0.95);
+  backdrop-filter: blur(10px);
+  padding: 16px 40px;
+  border-bottom: 1px solid rgba(196,168,130,0.2);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filter-btn {
+  padding: 7px 18px;
+  border-radius: 30px;
+  border: 1.5px solid var(--tan-light);
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--charcoal);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.filter-btn:hover { background: var(--tan-light); }
+.filter-btn.active { background: var(--sage); color: var(--white); border-color: var(--sage); }
+.filter-btn:active { transform: scale(0.95); }
+
+/* MENU SECTIONS */
+.menu-content { max-width: 1200px; margin: 0 auto; padding: 60px 40px; }
+.menu-category { margin-bottom: 70px; }
+.category-header {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(196,168,130,0.25);
+}
+.category-name {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--charcoal);
+}
+.category-tagline {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--muted);
+}
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* CARD FLIP */
+.menu-card-wrap {
+  height: 340px;
+  perspective: 1000px;
+}
+.menu-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  cursor: pointer;
+}
+.menu-card-wrap:hover .menu-card { transform: rotateY(180deg); }
+.menu-card-front, .menu-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.menu-card-front {
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+.menu-card-front img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+.menu-card-front-body { padding: 16px 18px; }
+.card-front-cat {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 4px;
+}
+.card-front-name {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--charcoal);
+  margin-bottom: 4px;
+}
+.card-front-price {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--terracotta);
+  font-weight: 600;
+}
+.sold-out-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--terracotta);
+  color: white;
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-family: var(--font-sans);
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+
+.menu-card-back {
+  background: var(--charcoal);
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+}
+.card-back-name {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--cream);
+  margin-bottom: 8px;
+}
+.card-back-tagline {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--tan);
+  margin-bottom: 14px;
+}
+.card-back-desc {
+  font-size: 13px;
+  color: rgba(245,240,228,0.7);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  flex: 1;
+}
+.card-back-addons {
+  margin-bottom: 14px;
+}
+.card-back-addons-title {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tan);
+  margin-bottom: 8px;
+}
+.addon-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.addon-btn {
+  padding: 4px 10px;
+  border: 1px solid rgba(196,168,130,0.35);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--tan-light);
+  font-size: 11px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-sans);
+}
+.addon-btn:hover, .addon-btn.selected {
+  background: var(--tan);
+  color: var(--charcoal);
+  border-color: var(--tan);
+}
+.card-back-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+.card-back-price {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--tan-light);
+  font-weight: 400;
+}
+.add-to-cart-btn {
+  padding: 8px 18px;
+  background: var(--sage);
+  color: var(--white);
+  border: none;
+  border-radius: 20px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 0.04em;
+}
+.add-to-cart-btn:hover { background: var(--sage-dark); transform: scale(1.05); }
+.add-to-cart-btn:active { transform: scale(0.97); }
+.add-to-cart-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* CART */
+.cart-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--charcoal);
+  color: var(--cream);
+  padding: 16px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 120;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.3);
+}
+.cart-bar.visible { transform: translateY(0); }
+.cart-bar-left { display: flex; align-items: center; gap: 16px; }
+.cart-count {
+  background: var(--terracotta);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+.cart-summary { font-family: var(--font-serif); font-size: 18px; }
+.cart-total { font-family: var(--font-serif); font-size: 20px; color: var(--tan-light); }
+.cart-actions { display: flex; gap: 10px; }
+.cart-btn {
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.cart-btn:active { transform: scale(0.95); }
+.cart-btn-view { background: transparent; color: var(--cream); border: 1px solid rgba(255,255,255,0.2); }
+.cart-btn-view:hover { background: rgba(255,255,255,0.1); }
+.cart-btn-order { background: var(--sage); color: white; }
+.cart-btn-order:hover { background: var(--sage-dark); }
+
+/* CART MODAL */
+.cart-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44,44,30,0.6);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.cart-modal-overlay.open { opacity: 1; pointer-events: all; }
+.cart-modal {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 400px;
+  background: var(--white);
+  z-index: 201;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+}
+.cart-modal-overlay.open .cart-modal { transform: translateX(0); }
+.cart-modal-header {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid rgba(196,168,130,0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cart-modal-header h3 { font-family: var(--font-serif); font-size: 24px; font-weight: 400; }
+.cart-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--cream-dark);
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+.cart-close-btn:hover { background: var(--tan-light); }
+.cart-items-list { flex: 1; overflow-y: auto; padding: 16px 24px; }
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(196,168,130,0.15);
+}
+.cart-item-img {
+  width: 54px;
+  height: 54px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.cart-item-info { flex: 1; }
+.cart-item-name { font-family: var(--font-serif); font-size: 16px; font-weight: 500; }
+.cart-item-addon { font-size: 11px; color: var(--muted); }
+.cart-item-price { font-family: var(--font-serif); font-size: 16px; color: var(--terracotta); font-weight: 600; }
+.cart-item-qty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--tan-light);
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  line-height: 1;
+}
+.qty-btn:hover { background: var(--tan-light); }
+.qty-num { font-size: 14px; font-weight: 500; min-width: 20px; text-align: center; }
+.cart-modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid rgba(196,168,130,0.2);
+}
+.cart-modal-total {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-serif);
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+.cart-modal-total-amt { color: var(--terracotta); font-weight: 600; }
+.cart-order-btns { display: flex; gap: 10px; }
+.cart-order-btns button { flex: 1; }
+.combo-note {
+  font-size: 11px;
+  color: var(--sage);
+  text-align: center;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* QUIET ADD-ONS NOTE */
+.addons-section {
+  max-width: 1200px;
+  margin: 0 auto 60px;
+  padding: 0 40px;
+}
+.addons-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+.addon-chip {
+  background: var(--white);
+  border: 1px solid var(--tan-light);
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 13px;
+  color: var(--charcoal);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.addon-chip span { color: var(--terracotta); font-weight: 600; }
+
+@media (max-width: 768px) {
+  .menu-content { padding: 40px 20px; }
+  .menu-filters { padding: 12px 20px; top: 60px; }
+  .cart-bar { padding: 12px 20px; }
+  .cart-modal { width: 100%; }
+  .menu-grid { grid-template-columns: 1fr 1fr; }
+  .addons-section { padding: 0 20px; }
+}
+@media (max-width: 480px) {
+  .menu-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="announcement-bar">
+  <div class="marquee-track">
+    <span id="ann-text-1">✦ Welcome to The Detox Club · 5% off combo meals: 1 drink + 1 food ✦ Follow & tag us on Instagram for 5% off ✦</span>
+    <span>✦ Welcome to The Detox Club · 5% off combo meals: 1 drink + 1 food ✦ Follow & tag us on Instagram for 5% off ✦</span>
+  </div>
+</div>
+
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo.webp" alt="Logo"/>
+    <div class="nav-logo-text">The Detox Club<span>Café · Collaboration · Calm</span></div>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="menu.html" class="active">Menu</a></li>
+    <li><a href="events.html">Events</a></li>
+    <li><a href="story.html">Our Story</a></li>
+    <li><a href="visit.html">Visit Us</a></li>
+    <li><a href="visit.html#reserve" class="nav-cta">Reserve a Seat</a></li>
+  </ul>
+  <div class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="menu-hero">
+  <h1>The Menu of Presence</h1>
+  <p>Every item made with intention. Hover a card to discover more.</p>
+</div>
+
+<div class="menu-filters" id="menu-filters">
+  <button class="filter-btn active" data-cat="all" onclick="filterMenu('all',this)">All</button>
+  <button class="filter-btn" data-cat="Core Brews" onclick="filterMenu('Core Brews',this)">Core Brews</button>
+  <button class="filter-btn" data-cat="Warm Detox" onclick="filterMenu('Warm Detox',this)">Warm Detox</button>
+  <button class="filter-btn" data-cat="Cold Detox" onclick="filterMenu('Cold Detox',this)">Cold Detox</button>
+  <button class="filter-btn" data-cat="Breakfast" onclick="filterMenu('Breakfast',this)">Breakfast</button>
+  <button class="filter-btn" data-cat="Detox Lunch" onclick="filterMenu('Detox Lunch',this)">Detox Lunch</button>
+  <button class="filter-btn" data-cat="Sweet Tooth" onclick="filterMenu('Sweet Tooth',this)">Sweet Tooth</button>
+</div>
+
+<div class="menu-content" id="menu-content">
+  <!-- Rendered by JS -->
+</div>
+
+<!-- QUIET ADD-ONS -->
+<div class="addons-section">
+  <span class="section-subtitle">Quiet Add-Ons</span>
+  <div class="addons-grid">
+    <div class="addon-chip">Add Eggs <span>Rs. 100</span></div>
+    <div class="addon-chip">Add Grilled Chicken <span>Rs. 120</span></div>
+    <div class="addon-chip">Brown Toast <span>Rs. 50</span></div>
+    <div class="addon-chip">Extra Fruits <span>Rs. 100</span></div>
+    <div class="addon-chip">Extra Yogurt <span>Rs. 70</span></div>
+    <div class="addon-chip">Extra Custard <span>Rs. 150</span></div>
+    <div class="addon-chip">Extra Cream <span>Rs. 100</span></div>
+  </div>
+</div>
+
+<!-- CART BAR -->
+<div class="cart-bar" id="cart-bar">
+  <div class="cart-bar-left">
+    <div class="cart-count" id="cart-count">0</div>
+    <div class="cart-summary" id="cart-summary">items in your order</div>
+  </div>
+  <div class="cart-total" id="cart-total-bar">Rs. 0</div>
+  <div class="cart-actions">
+    <button class="cart-btn cart-btn-view" onclick="openCart()">View Order</button>
+    <button class="cart-btn cart-btn-order" onclick="placeOrder()">Place Order →</button>
+  </div>
+</div>
+
+<!-- CART MODAL -->
+<div class="cart-modal-overlay" id="cart-overlay" onclick="closeCartIfOutside(event)">
+  <div class="cart-modal" id="cart-modal">
+    <div class="cart-modal-header">
+      <h3>Your Order</h3>
+      <button class="cart-close-btn" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-items-list" id="cart-items-list"></div>
+    <div class="cart-modal-footer">
+      <div class="cart-modal-total">
+        <span>Total</span>
+        <span class="cart-modal-total-amt" id="cart-total-modal">Rs. 0</span>
+      </div>
+      <div class="cart-order-btns">
+        <button class="btn btn-secondary" onclick="orderViaWhatsApp()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </button>
+        <button class="btn btn-primary" onclick="orderViaEmail()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          Email Order
+        </button>
+      </div>
+      <p class="combo-note">💚 1 drink + 1 food = 5% combo discount applied at checkout</p>
+    </div>
+  </div>
+</div>
+
+<!-- FLOATING BUTTONS -->
+<div class="floating-buttons">
+  <a href="https://wa.me/9779849197952" class="float-btn float-btn-wa" target="_blank">
+    <span class="float-btn-label">WhatsApp us</span>
+    <svg viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+  <a href="https://instagram.com/the.detoxclub" class="float-btn float-btn-ig" target="_blank">
+    <span class="float-btn-label">Follow us</span>
+    <svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+  </a>
+  <a href="mailto:hello@thedetoxclub.com" class="float-btn float-btn-email">
+    <span class="float-btn-label">Email us</span>
+    <svg viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+  </a>
+</div>
+
+<a href="dashboard.html" class="dashboard-subtle" title="Owner Access">
+  <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+</a>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <img src="images/logo.webp" alt="Logo"/>
+      <h3>The Detox Club</h3>
+      <p>A sanctuary for the senses.<br/>Est. 2026, Lalitpur</p>
+    </div>
+    <div class="footer-col"><h4>Navigate</h4><ul>
+      <li><a href="index.html">Home</a></li><li><a href="menu.html">Menu</a></li>
+      <li><a href="events.html">Events</a></li><li><a href="story.html">Our Story</a></li><li><a href="visit.html">Visit Us</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Visit</h4><p>Walkhu Galli<br/>Lalitpur 44600, Nepal<br/>10:00 AM – 8:00 PM Daily</p></div>
+    <div class="footer-col"><h4>Connect</h4><ul>
+      <li><a href="https://wa.me/9779849197952">WhatsApp</a></li>
+      <li><a href="https://instagram.com/the.detoxclub">Instagram</a></li>
+      <li><a href="mailto:hello@thedetoxclub.com">Email</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 The Detox Club</span><span>Made with 🌿 in Lalitpur</span></div>
+</footer>
+
+<script>
+// ── MENU DATA ──
+const MENU_DATA = [
+  { id:'mint-black', name:'Mint Black Tea', tagline:'Clarity', cat:'Core Brews', price:'Rs. 50', priceNum:50, desc:'Cool mint meets bold black tea. A daily ritual of clarity.', img:'images/mint-black.jpg', addons:['Add Honey +Rs.30'] },
+  { id:'masala-tea', name:'Masala Tea', tagline:'A Symphony', cat:'Core Brews', price:'Rs. 60', priceNum:60, desc:'A symphony of spices. Warmth brewed to absolute perfection.', img:'images/masala-tea.jpg', addons:[] },
+  { id:'coffee', name:'Traditional Coffee', tagline:'The Anchor', cat:'Core Brews', price:'Rs. 100 / 150', priceNum:100, desc:'Rich, grounding, honest. Black or with milk — your choice.', img:'images/coffee.jpg', addons:['With Milk +Rs.50'] },
+  { id:'english-tea', name:'English Breakfast Tea', tagline:'The Classic', cat:'Core Brews', price:'Rs. 150', priceNum:150, desc:'A cup that never lets you down. Timeless comfort.', img:'images/english-tea.jpg', addons:[] },
+  { id:'kaadaa', name:'Kaa-daa', tagline:'The Rejuvenation', cat:'Warm Detox', price:'Rs. 150', priceNum:150, desc:'Sacred spice blend. Ancient recipe, modern soul.', img:'images/kaadaa.jpg', addons:[] },
+  { id:'golden-milk', name:'Golden Mountain Milk', tagline:'The Healing Light', cat:'Warm Detox', price:'Rs. 150', priceNum:150, desc:'Turmeric warmth in a glass. Golden, healing, radiant.', img:'images/golden-milk.jpg', addons:[] },
+  { id:'lemon-ginger', name:'Hot Lemon Ginger Honey', tagline:'Simplicity', cat:'Warm Detox', price:'Rs. 150', priceNum:150, desc:'Bright, alive, and cleansing. Three ingredients, infinite comfort.', img:'images/lemon-ginger.jpg', addons:[] },
+  { id:'apple-spice', name:'Apple Spice Brew', tagline:'Nostalgia', cat:'Warm Detox', price:'Rs. 150', priceNum:150, desc:'Autumn warmth, always. Apple and cinnamon in perfect harmony.', img:'images/apple-spice.jpg', addons:[] },
+  { id:'bel-elixir', name:'Bel Elixir', tagline:'Patience', cat:'Cold Detox', price:'Rs. 300', priceNum:300, desc:'A cooling, ancient remedy. Patience rewarded in every sip.', img:'images/bel-elixir.jpg', addons:[] },
+  { id:'chlorophyll-juice', name:'Chlorophyll Green Juice', tagline:'Liquid Sunlight', cat:'Cold Detox', price:'Rs. 300', priceNum:300, desc:'Pure, alive, and green. Sunshine pressed into a bottle.', img:'images/chlorophyll-juice.jpg', addons:[] },
+  { id:'abc-vitality', name:'ABC Vitality', tagline:'Vitality', cat:'Cold Detox', price:'Rs. 300', priceNum:300, desc:"Apple, Beet, Carrot. Nature's power trio.", img:'images/abc-vitality.jpg', addons:[] },
+  { id:'matcha', name:'Matcha', tagline:"The Monk's Focus", cat:'Cold Detox', price:'Rs. 350', priceNum:350, desc:'Ceremonial grade, lovingly prepared. Focus and calm in a glass.', img:'images/matcha.webp', addons:['Extra Shot +Rs.50'] },
+  { id:'detox-breakfast', name:'Detox Breakfast', tagline:'The All-Morning', cat:'Breakfast', price:'Rs. 400 + 120', priceNum:400, desc:'Brown toast, mushrooms, veggies sauté, fruits, eggs. The full morning.', img:'images/detox-breakfast.jpg', addons:['Add Chicken +Rs.120'] },
+  { id:'detox-fruity-pancake', name:'Detox Fruity Pancakes', tagline:'Gentle Indulgence', cat:'Breakfast', price:'Rs. 250 + 100', priceNum:250, desc:'Oranges or strawberries with maple syrup, cream, yogurt or custard.', img:'images/detox-fruity-pancake.jpg', addons:['Add Yogurt +Rs.70','Add Cream +Rs.100','Add Custard +Rs.150'] },
+  { id:'detox-meal', name:'Detox Meal', tagline:'Grounded Nourishment', cat:'Detox Lunch', price:'Rs. 350 + 120', priceNum:350, desc:'Rice cooked soft, topped with sautéed mushrooms, spinach, sesame seeds, veggies.', img:'images/detox-meal.jpg', addons:['Add Chicken +Rs.120'] },
+  { id:'detox-bake', name:'Detox Bake', tagline:'Earth & Oven', cat:'Detox Lunch', price:'Rs. 250 + 120', priceNum:250, desc:'Baked sweet potato with veggies and optional grilled chicken.', img:'images/detox-bake.jpg', addons:['Add Chicken +Rs.120'] },
+  { id:'detox-mash', name:'Detox Mash', tagline:'The Soften', cat:'Detox Lunch', price:'Rs. 350', priceNum:350, desc:'Mashed potatoes with cauli, sauté veggies, and grilled chicken.', img:'images/detox-mash.jpg', addons:['Add Grilled Chicken +Rs.120'] },
+  { id:'lunch-bowl', name:'Detox Lunch Bowl', tagline:'Complete', cat:'Detox Lunch', price:'Rs. 350', priceNum:350, desc:'Rice, chicken, mushroom, potato, spinach and sesame seeds.', img:'images/lunch-bowl.jpg', addons:[] },
+  { id:'orange-magic', name:'Orange Magic', tagline:'Sunshine', cat:'Sweet Tooth', price:'Rs. 150', priceNum:150, desc:'Orange zest and sweetness. A slice of sunshine.', img:'images/orange-magic.jpg', addons:['Add Cream +Rs.100'] },
+  { id:'strawberry-angels', name:'Strawberry Angels', tagline:'Light as Clouds', cat:'Sweet Tooth', price:'Rs. 150', priceNum:150, desc:'Strawberries, cream, joy. Light as angels, sweet as dreams.', img:'images/strawberry-angels.jpg', addons:['Add Extra Fruits +Rs.100'] },
+  { id:'apple-melts', name:'Apple Melts', tagline:'Pure Comfort', cat:'Sweet Tooth', price:'Rs. 150', priceNum:150, desc:'Warm apple caramel in a cup. The taste of a cozy afternoon.', img:'images/apple-melts.jpg', addons:['Add Cream +Rs.100'] },
+];
+
+const CATEGORIES = [
+  { key:'Core Brews', tagline:'The daily ritual' },
+  { key:'Warm Detox', tagline:'Warmth from within' },
+  { key:'Cold Detox', tagline:'Cold, alive, exclusive' },
+  { key:'Breakfast', tagline:'All morning, every morning' },
+  { key:'Detox Lunch', tagline:'Nourish and restore' },
+  { key:'Sweet Tooth', tagline:'A little indulgence' },
+];
+
+// ── CART STATE ──
+let cart = [];
+let selectedAddons = {}; // itemId -> addon string
+
+// ── LOAD SOLD-OUT FROM STORAGE ──
+function getSoldOut() {
+  try { return JSON.parse(localStorage.getItem('detox_soldout') || '[]'); } catch { return []; }
+}
+
+// ── RENDER MENU ──
+function renderMenu(filterCat='all') {
+  const content = document.getElementById('menu-content');
+  const soldOut = getSoldOut();
+  // Load custom menu from localStorage (if owner updated)
+  let menuData = MENU_DATA;
+  try {
+    const stored = JSON.parse(localStorage.getItem('detox_menu') || 'null');
+    if (stored && stored.length) menuData = stored;
+  } catch {}
+
+  const cats = filterCat === 'all' ? CATEGORIES : CATEGORIES.filter(c => c.key === filterCat);
+  content.innerHTML = cats.map(cat => {
+    const items = menuData.filter(m => m.cat === cat.key);
+    if (!items.length) return '';
+    return `
+      <div class="menu-category" data-cat="${cat.key}">
+        <div class="category-header">
+          <div class="category-name">${cat.key}</div>
+          <div class="category-tagline">${cat.tagline}</div>
+        </div>
+        <div class="menu-grid">
+          ${items.map(item => {
+            const isSoldOut = soldOut.includes(item.id);
+            return `
+            <div class="menu-card-wrap reveal" id="card-${item.id}">
+              <div class="menu-card">
+                <div class="menu-card-front">
+                  <img src="${item.img}" alt="${item.name}" onerror="this.style.background='#e8e0cc';this.style.minHeight='200px'"/>
+                  ${isSoldOut ? '<div class="sold-out-badge">Sold Out</div>' : ''}
+                  <div class="menu-card-front-body">
+                    <div class="card-front-cat">${item.cat}</div>
+                    <div class="card-front-name">${item.name}</div>
+                    <div class="card-front-price">${item.price}</div>
+                  </div>
+                </div>
+                <div class="menu-card-back">
+                  <div class="card-back-name">${item.name}</div>
+                  <div class="card-back-tagline">${item.tagline}</div>
+                  <div class="card-back-desc">${item.desc}</div>
+                  ${item.addons && item.addons.length ? `
+                    <div class="card-back-addons">
+                      <div class="card-back-addons-title">Add-ons</div>
+                      <div class="addon-btns">
+                        ${item.addons.map(a => `
+                          <button class="addon-btn" onclick="toggleAddon(event,'${item.id}','${a}')">${a}</button>
+                        `).join('')}
+                      </div>
+                    </div>
+                  ` : ''}
+                  <div class="card-back-footer">
+                    <div class="card-back-price">${item.price}</div>
+                    <button class="add-to-cart-btn" onclick="addToCart(event,'${item.id}')" ${isSoldOut?'disabled':''}>
+                      ${isSoldOut ? 'Sold Out' : '+ Add'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }).join('');
+  initReveal();
+}
+
+function filterMenu(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMenu(cat);
+}
+
+// ── ADD-ONS ──
+function toggleAddon(e, itemId, addon) {
+  e.stopPropagation();
+  const btn = e.currentTarget;
+  if (selectedAddons[itemId] === addon) {
+    delete selectedAddons[itemId];
+    btn.classList.remove('selected');
+  } else {
+    // deselect others
+    document.querySelectorAll(`#card-${itemId} .addon-btn`).forEach(b => b.classList.remove('selected'));
+    selectedAddons[itemId] = addon;
+    btn.classList.add('selected');
+  }
+}
+
+// ── CART ──
+function addToCart(e, itemId) {
+  e.stopPropagation();
+  let menuData = MENU_DATA;
+  try { const s = JSON.parse(localStorage.getItem('detox_menu')||'null'); if(s&&s.length) menuData=s; } catch {}
+  const item = menuData.find(m => m.id === itemId);
+  if (!item) return;
+  const addon = selectedAddons[itemId] || null;
+  const existing = cart.find(c => c.id === itemId && c.addon === addon);
+  if (existing) { existing.qty++; } else { cart.push({ ...item, addon, qty: 1 }); }
+  updateCartUI();
+  // flash animation
+  const btn = e.currentTarget;
+  btn.textContent = '✓ Added!';
+  btn.style.background = '#4caf50';
+  setTimeout(() => { btn.textContent = '+ Add'; btn.style.background = ''; }, 1200);
+}
+
+function updateCartUI() {
+  const totalItems = cart.reduce((s,c) => s+c.qty, 0);
+  const totalPrice = cart.reduce((s,c) => s + c.priceNum * c.qty, 0);
+  document.getElementById('cart-count').textContent = totalItems;
+  document.getElementById('cart-summary').textContent = totalItems === 1 ? 'item in your order' : 'items in your order';
+  document.getElementById('cart-total-bar').textContent = `Rs. ${totalPrice}`;
+  document.getElementById('cart-total-modal').textContent = `Rs. ${totalPrice}`;
+  document.getElementById('cart-bar').classList.toggle('visible', totalItems > 0);
+  renderCartItems();
+}
+
+function renderCartItems() {
+  const list = document.getElementById('cart-items-list');
+  if (!cart.length) { list.innerHTML = '<p style="text-align:center;color:var(--muted);padding:40px;font-style:italic;">Your order is empty.</p>'; return; }
+  list.innerHTML = cart.map((item, idx) => `
+    <div class="cart-item">
+      <img src="${item.img}" alt="${item.name}" class="cart-item-img" onerror="this.style.background='#e8e0cc'"/>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        ${item.addon ? `<div class="cart-item-addon">${item.addon}</div>` : ''}
+        <div class="cart-item-price">${item.price}</div>
+      </div>
+      <div class="cart-item-qty">
+        <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function changeQty(idx, delta) {
+  cart[idx].qty += delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  updateCartUI();
+}
+
+function openCart() { document.getElementById('cart-overlay').classList.add('open'); }
+function closeCart() { document.getElementById('cart-overlay').classList.remove('open'); }
+function closeCartIfOutside(e) { if (e.target === document.getElementById('cart-overlay')) closeCart(); }
+
+function buildOrderText() {
+  const lines = cart.map(c => `• ${c.name}${c.addon?' ('+c.addon+')':''} x${c.qty} — ${c.price}`);
+  const total = cart.reduce((s,c) => s+c.priceNum*c.qty, 0);
+  // Check combo discount
+  const hasDrink = cart.some(c => ['Core Brews','Warm Detox','Cold Detox'].includes(c.cat));
+  const hasFood = cart.some(c => ['Breakfast','Detox Lunch','Sweet Tooth'].includes(c.cat));
+  const discount = hasDrink && hasFood ? Math.round(total * 0.05) : 0;
+  return { lines, total, discount };
+}
+
+function orderViaWhatsApp() {
+  if (!cart.length) return;
+  const { lines, total, discount } = buildOrderText();
+  let msg = `🌿 *Order from The Detox Club*\n\n${lines.join('\n')}\n\n*Subtotal: Rs. ${total}*`;
+  if (discount) msg += `\n*5% Combo Discount: -Rs. ${discount}*\n*Total: Rs. ${total-discount}*`;
+  msg += `\n\nPlease confirm my order. Thank you! 🙏`;
+  window.open(`https://wa.me/9779849197952?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function orderViaEmail() {
+  if (!cart.length) return;
+  const { lines, total, discount } = buildOrderText();
+  let body = `Order from The Detox Club\n\n${lines.join('\n')}\n\nSubtotal: Rs. ${total}`;
+  if (discount) body += `\n5% Combo Discount: -Rs. ${discount}\nTotal: Rs. ${total-discount}`;
+  body += `\n\nPlease confirm my order. Thank you!`;
+  window.location.href = `mailto:hello@thedetoxclub.com?subject=Order%20from%20The%20Detox%20Club&body=${encodeURIComponent(body)}`;
+}
+
+function placeOrder() { openCart(); }
+
+// Announce & load
+function loadAnnouncement() {
+  try {
+    const s = JSON.parse(localStorage.getItem('detox_settings')||'{}');
+    const ann = s.announcement || '✦ Welcome to The Detox Club · 5% off combo meals: 1 drink + 1 food ✦ Follow & tag us on Instagram for 5% off ✦';
+    document.getElementById('ann-text-1').textContent = ann;
+  } catch {}
+}
+loadAnnouncement();
+
+// Navbar scroll
+window.addEventListener('scroll', () => { document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60); });
+document.getElementById('hamburger').addEventListener('click', () => { document.getElementById('nav-links').classList.toggle('open'); });
+
+// Scroll reveal
+function initReveal() {
+  const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);} }), { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+}
+
+renderMenu();
+</script>
+</body>
+</html>
